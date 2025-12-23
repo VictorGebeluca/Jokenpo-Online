@@ -63,7 +63,7 @@ export default function Jogo() {
         <Placar pontosJogador={placarJogador} pontosBot={placarBot} />
       </div>
 
-      <div className="jogo-content">
+      <div className="arena-wrapper">
         <Arena
           escolhaJogador={escolhaJogador}
           escolhaOponente={escolhaOponente}
@@ -75,14 +75,16 @@ export default function Jogo() {
           <Resultado resultado={resultado} />
         )}
 
-        {faseRodada === "escolher" && (
-          <BarraEscolhas onEscolher={jogar} bloqueado={faseRodada !== "escolher"} />
-        )}
-
         {faseRodada === "mostrarResultado" && (
           <button className="btn-proxima" onClick={proximaRodada}>
             Próxima rodada
           </button>
+        )}
+      </div>
+
+      <div className="barra-container">
+        {faseRodada === "escolher" && (
+          <BarraEscolhas onEscolher={jogar} bloqueado={faseRodada !== "escolher"} />
         )}
       </div>
     </div>
