@@ -1,18 +1,83 @@
-.resultado {
-  margin-top: 20px;
+.resultado-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 20;
+}
+
+/* Card atualizado */
+.resultado-card {
+  font-size: 3rem;
+  font-weight: 900;
+  letter-spacing: 2px;
+  padding: 24px 48px;
+  border-radius: 20px;
+  text-transform: uppercase;
+  color: white;
   text-align: center;
-  font-size: 1.2rem;
-  font-weight: 600;
+  animation: arcade-pop 0.8s ease-out forwards;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
 }
 
-.resultado.vitoria {
-  color: #22c55e;
+/* Cores */
+.vitoria {
+  background: linear-gradient(135deg, #22c55e, #16a34a);
+  box-shadow: 0 0 30px rgba(34, 197, 94, 0.8);
 }
 
-.resultado.derrota {
-  color: #ef4444;
+.derrota {
+  background: linear-gradient(135deg, #ef4444, #b91c1c);
+  box-shadow: 0 0 30px rgba(239, 68, 68, 0.8);
 }
 
-.resultado.empate {
-  color: #eab308;
+.empate {
+  background: linear-gradient(135deg, #eab308, #ca8a04);
+  box-shadow: 0 0 30px rgba(234, 179, 8, 0.8);
+}
+
+/* 🎮 Animação arcade pop */
+@keyframes arcade-pop {
+  0% {
+    transform: scale(0.3) rotate(-10deg);
+    opacity: 0;
+  }
+  40% {
+    transform: scale(1.3) rotate(5deg);
+    opacity: 1;
+  }
+  55% {
+    transform: scale(0.95) rotate(-3deg);
+  }
+  70% {
+    transform: scale(1.05) rotate(2deg);
+  }
+  100% {
+    transform: scale(1) rotate(0deg);
+  }
+}
+
+/* Confetes */
+.confete {
+  position: absolute;
+  top: 0;
+  width: 6px;
+  height: 6px;
+  background-color: red;
+  opacity: 0.8;
+  border-radius: 50%;
+  animation: cair 3s linear forwards;
+}
+
+@keyframes cair {
+  0% {
+    transform: translateY(0) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(100vh) rotate(360deg);
+    opacity: 0;
+  }
 }

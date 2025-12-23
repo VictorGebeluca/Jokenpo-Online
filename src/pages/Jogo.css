@@ -1,10 +1,12 @@
 .jogo-container {
   min-height: 100vh;
+  position: relative;
   display: flex;
   flex-direction: column;
   background: linear-gradient(180deg, #0f172a, #020617);
   color: white;
 }
+
 
 /* topo */
 .jogo-container > .placar {

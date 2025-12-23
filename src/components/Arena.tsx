@@ -6,7 +6,7 @@ interface Props {
   escolhaOponente: Escolha | null;
 }
 
-function renderMao(escolha: Escolha | null) {
+function renderMao(escolha: Escolha | null, lado: "jogador" | "oponente") {
   if (!escolha) {
     return <span className="interrogacao">❔</span>;
   }
@@ -15,7 +15,7 @@ function renderMao(escolha: Escolha | null) {
     <img
       src={`/${escolha}.png`}
       alt={escolha}
-      className="mao-img"
+      className={`mao-img animacao-${lado}`}
     />
   );
 }
@@ -24,8 +24,13 @@ export default function Arena({ escolhaJogador, escolhaOponente }: Props) {
   return (
     <div className="arena">
       <div className="maos">
-        <div className="mao">{renderMao(escolhaJogador)}</div>
-        <div className="mao">{renderMao(escolhaOponente)}</div>
+        <div className="mao">
+          {renderMao(escolhaJogador, "jogador")}
+        </div>
+
+        <div className="mao">
+          {renderMao(escolhaOponente, "oponente")}
+        </div>
       </div>
     </div>
   );

@@ -17,13 +17,48 @@
   justify-content: center;
 }
 
+/* Imagem da mão */
 .mao-img {
   width: 100%;
   max-width: 90px;
   object-fit: contain;
+  opacity: 0;
 }
 
+/* Interrogação */
 .interrogacao {
   font-size: 3rem;
   opacity: 0.5;
+}
+
+/* ===== ANIMAÇÕES ===== */
+
+.animacao-jogador {
+  animation: entrar-esquerda 0.4s ease-out forwards;
+}
+
+.animacao-oponente {
+  animation: entrar-direita 0.4s ease-out forwards;
+}
+
+@keyframes entrar-esquerda {
+  from {
+    transform: translateX(-40px) scale(0.9);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0) scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes entrar-direita {
+  from {
+    transform: translateX(40px) scale(0.9);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0) scale(1);
+    opacity: 1;
+  }
 }
