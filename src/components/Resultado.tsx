@@ -1,19 +1,25 @@
 import "./Resultado.css";
+import type { Escolha } from "../types/jogo";
 
 interface Props {
-  resultado: "jogador" | "bot" | "empate" | null;
+  jogador: Escolha | null;
+  bot: Escolha | null;
 }
 
-export default function Resultado({ resultado }: Props) {
-  if (!resultado) return null;
+export default function Resultado({ jogador, bot }: Props) {
+  if (!jogador || !bot) return null;
 
   let texto = "Empate!";
   let classe = "empate";
 
-  if (resultado === "jogador") {
+  if (
+    (jogador === "pedra" && bot === "tesoura") ||
+    (jogador === "papel" && bot === "pedra") ||
+    (jogador === "tesoura" && bot === "papel")
+  ) {
     texto = "Você venceu!";
     classe = "vitoria";
-  } else if (resultado === "bot") {
+  } else if (jogador !== bot) {
     texto = "Você perdeu!";
     classe = "derrota";
   }

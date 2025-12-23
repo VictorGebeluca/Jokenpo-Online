@@ -1,45 +1,14 @@
 .arena {
   display: flex;
-  flex-direction: column;
-  align-items: center;
+  justify-content: center;
+  margin: 30px 0;
 }
 
 .maos {
   display: flex;
-  gap: 100px;
+  gap: 80px;
 }
 
-.mao img {
-  width: 120px;
-  animation: slideIn 0.4s ease;
-}
-
-@keyframes slideIn {
-  from {
-    transform: translateY(20px);
-    opacity: 0;
-  }
-  to {
-    transform: translateY(0);
-    opacity: 1;
-  }
-}
-
-.jokenpo {
-  font-size: 3rem;
-  font-weight: bold;
-  display: flex;
-  gap: 10px;
-  margin-bottom: 30px;
-}
-
-.jokenpo span {
-  opacity: 0;
-  transform: scale(0.5);
-  transition: all 0.3s ease;
-}
-
-.jokenpo span.ativo {
-  opacity: 1;
-  transform: scale(1.2);
+.mao {
+  font-size: 4rem;
 }
