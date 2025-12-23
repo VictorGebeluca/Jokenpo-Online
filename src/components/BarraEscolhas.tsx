@@ -1,22 +1,22 @@
 import "./BarraEscolhas.css";
 
 interface Props {
-  onEscolher: (escolha: string) => void;
+  onEscolher: (escolha: "pedra" | "papel" | "tesoura") => void;
 }
 
 export default function BarraEscolhas({ onEscolher }: Props) {
   return (
     <div className="barra">
-      <button className="botao" onClick={() => onEscolher("✊")}>
-        <img src="/pedra.png" alt="Pedra" className="mao-img" />
+      <button onClick={() => onEscolher("pedra")}>
+        <img src="/pedra.png" alt="Pedra" />
       </button>
 
-      <button className="botao" onClick={() => onEscolher("✋")}>
-        ✋
+      <button onClick={() => onEscolher("papel")}>
+        <img src="/papel.png" alt="Papel" />
       </button>
 
-      <button className="botao" onClick={() => onEscolher("✌️")}>
-        ✌️
+      <button onClick={() => onEscolher("tesoura")}>
+        <img src="/tesoura.png" alt="Tesoura" />
       </button>
     </div>
   );

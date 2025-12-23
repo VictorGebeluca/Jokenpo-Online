@@ -1,46 +1,21 @@
 import "./Arena.css";
 
 type Props = {
-  escolhaJogador: string | null;
-  escolhaOponente: string | null;
-  vencedor: "jogador" | "bot" | "empate" | null;
+  escolhaJogador: "pedra" | "papel" | "tesoura" | null;
+  escolhaOponente: "pedra" | "papel" | "tesoura" | null;
   faseRodada: "escolher" | "jo" | "ken" | "po" | "mostrarResultado";
 };
 
-function renderMao(escolha: string | null) {
-  if (!escolha) return null;
-
-  if (escolha === "✊") {
-    return <img src="/pedra.png" alt="Pedra" className="mao-img" />;
-  }
-
-  return <span className="mao-emoji">{escolha}</span>;
+function imagem(mao: string | null) {
+  if (!mao) return null;
+  return <img src={`/${mao}.png`} alt={mao} />;
 }
 
 export default function Arena({
   escolhaJogador,
   escolhaOponente,
-  vencedor,
   faseRodada,
 }: Props) {
-  const maoJogadorClasse =
-    faseRodada === "mostrarResultado"
-      ? vencedor === "jogador"
-        ? "mao win"
-        : vencedor === "bot"
-        ? "mao lose"
-        : "mao"
-      : "mao";
-
-  const maoBotClasse =
-    faseRodada === "mostrarResultado"
-      ? vencedor === "bot"
-        ? "mao win"
-        : vencedor === "jogador"
-        ? "mao lose"
-        : "mao"
-      : "mao";
-
   return (
     <div className="arena">
       {(faseRodada === "jo" ||
@@ -55,13 +30,8 @@ export default function Arena({
 
       {faseRodada === "mostrarResultado" && (
         <div className="maos">
-          <div className={maoJogadorClasse}>
-            {renderMao(escolhaJogador)}
-          </div>
-
-          <div className={maoBotClasse}>
-            {renderMao(escolhaOponente)}
-          </div>
+          <div className="mao">{imagem(escolhaJogador)}</div>
+          <div className="mao">{imagem(escolhaOponente)}</div>
         </div>
       )}
     </div>

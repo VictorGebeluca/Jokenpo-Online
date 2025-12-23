@@ -1,25 +1,21 @@
 .barra {
   display: flex;
-  gap: 24px;
   justify-content: center;
-  margin-top: 20px;
+  gap: 40px;
+  padding: 20px;
 }
 
-.botao {
-  background: transparent;
+.barra button {
+  background: none;
   border: none;
-  font-size: 3rem;
   cursor: pointer;
-  padding: 10px;
+}
+
+.barra img {
+  width: 80px;
   transition: transform 0.2s ease;
 }
 
-.botao:hover {
-  transform: scale(1.15);
-}
-
-.mao-img {
-  width: 70px;
-  height: 70px;
-  object-fit: contain;
+.barra img:hover {
+  transform: scale(1.1);
 }

@@ -2,76 +2,44 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
 }
 
-/* JO KEN PO */
+.maos {
+  display: flex;
+  gap: 100px;
+}
+
+.mao img {
+  width: 120px;
+  animation: slideIn 0.4s ease;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
 .jokenpo {
   font-size: 3rem;
   font-weight: bold;
   display: flex;
-  gap: 0.5rem;
-  margin-bottom: 40px;
+  gap: 10px;
+  margin-bottom: 30px;
 }
 
 .jokenpo span {
   opacity: 0;
   transform: scale(0.5);
-  transition: opacity 0.3s ease, transform 0.3s ease;
+  transition: all 0.3s ease;
 }
 
 .jokenpo span.ativo {
   opacity: 1;
   transform: scale(1.2);
-}
-
-/* MÃOS */
-.maos {
-  display: flex;
-  gap: 80px;
-  margin-top: 20px;
-}
-
-.mao {
-  font-size: 4rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.mao-emoji {
-  font-size: 4rem;
-}
-
-/* imagem da pedra */
-.mao-img {
-  width: 90px;
-  height: 90px;
-  object-fit: contain;
-}
-
-/* animações */
-.mao.win {
-  animation: glow 1s infinite alternate;
-}
-
-.mao.lose {
-  animation: shake 0.3s;
-}
-
-@keyframes glow {
-  from {
-    box-shadow: 0 0 10px #22c55e;
-  }
-  to {
-    box-shadow: 0 0 25px #22c55e;
-  }
-}
-
-@keyframes shake {
-  0% { transform: translateX(0); }
-  25% { transform: translateX(-5px); }
-  50% { transform: translateX(5px); }
-  75% { transform: translateX(-5px); }
-  100% { transform: translateX(0); }
 }
