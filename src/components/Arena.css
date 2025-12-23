@@ -6,9 +6,24 @@
 
 .maos {
   display: flex;
-  gap: 80px;
+  gap: 60px;
 }
 
 .mao {
-  font-size: 4rem;
+  width: 100px;
+  height: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mao-img {
+  width: 100%;
+  max-width: 90px;
+  object-fit: contain;
+}
+
+.interrogacao {
+  font-size: 3rem;
+  opacity: 0.5;
 }

@@ -6,13 +6,18 @@ interface Props {
   escolhaOponente: Escolha | null;
 }
 
-// converte escolha lógica → visual
 function renderMao(escolha: Escolha | null) {
-  if (!escolha) return "❔";
+  if (!escolha) {
+    return <span className="interrogacao">❔</span>;
+  }
 
-  if (escolha === "pedra") return "✊";
-  if (escolha === "papel") return "✋";
-  if (escolha === "tesoura") return "✌️";
+  return (
+    <img
+      src={`/${escolha}.png`}
+      alt={escolha}
+      className="mao-img"
+    />
+  );
 }
 
 export default function Arena({ escolhaJogador, escolhaOponente }: Props) {
