@@ -1,0 +1,14 @@
+.barra {
+  display: flex;
+  gap: 30px;
+  position: absolute;
+  bottom: 40px;
+}
+
+.botao {
+  font-size: 3rem;
+  padding: 0;
+  border: none;
+  cursor: pointer;
+  background: none;
+}

@@ -1,0 +1,25 @@
+.resultado {
+  font-size: 1.8rem;
+  font-weight: bold;
+  text-align: center;
+  margin: 20px 0 40px; /* espaço da mensagem */
+  opacity: 0;
+  animation: resultadoFade 0.6s ease forwards;
+}
+
+.resultado.vitoria {
+  color: #22c55e; /* verde */
+}
+
+.resultado.derrota {
+  color: #ef4444; /* vermelho */
+}
+
+.resultado.empate {
+  color: #6b7280; /* cinza */
+}
+
+@keyframes resultadoFade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}

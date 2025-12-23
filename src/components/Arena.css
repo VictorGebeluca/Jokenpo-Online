@@ -1,0 +1,58 @@
+.arena {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+}
+
+.jokenpo {
+  font-size: 3rem;
+  font-weight: bold;
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 20px;
+}
+
+.jokenpo span {
+  opacity: 0;
+  transform: scale(0.5);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.jokenpo span.ativo {
+  opacity: 1;
+  transform: scale(1.2);
+}
+
+.maos {
+  display: flex;
+  gap: 80px;
+  margin-top: 20px;
+}
+
+.mao {
+  font-size: 4rem;
+  display: inline-block;
+}
+
+.mao.win {
+  animation: glow 1s infinite alternate;
+}
+
+.mao.lose {
+  animation: shake 0.3s;
+}
+
+@keyframes glow {
+  from { text-shadow: 0 0 10px #22c55e; }
+  to { text-shadow: 0 0 25px #22c55e; }
+}
+
+@keyframes shake {
+  0% { transform: translateX(0); }
+  25% { transform: translateX(-5px); }
+  50% { transform: translateX(5px); }
+  75% { transform: translateX(-5px); }
+  100% { transform: translateX(0); }
+}

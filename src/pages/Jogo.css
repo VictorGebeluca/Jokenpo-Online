@@ -1,0 +1,40 @@
+.jogo-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 100vh;
+  justify-content: space-between;
+  padding: 20px;
+}
+
+.placar-container {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.jogo-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+
+.btn-proxima {
+  padding: 12px 24px;
+  font-size: 1.2rem;
+  background: #7dd3fc; /* azul claro */
+  border: none;
+  border-radius: 8px;
+  color: #020617;
+  font-weight: bold;
+  cursor: pointer;
+  margin-top: 20px; /* espaço da mensagem */
+  animation: piscar 1s infinite;
+}
+
+@keyframes piscar {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
