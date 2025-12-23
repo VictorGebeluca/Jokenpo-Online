@@ -7,6 +7,16 @@ type Props = {
   faseRodada: "escolher" | "jo" | "ken" | "po" | "mostrarResultado";
 };
 
+function renderMao(escolha: string | null) {
+  if (!escolha) return null;
+
+  if (escolha === "✊") {
+    return <img src="/pedra.png" alt="Pedra" className="mao-img" />;
+  }
+
+  return <span className="mao-emoji">{escolha}</span>;
+}
+
 export default function Arena({
   escolhaJogador,
   escolhaOponente,
@@ -16,16 +26,20 @@ export default function Arena({
   const maoJogadorClasse =
     faseRodada === "mostrarResultado"
       ? vencedor === "jogador"
-        ? "mao jogador win"
-        : "mao jogador lose"
-      : "mao jogador";
+        ? "mao win"
+        : vencedor === "bot"
+        ? "mao lose"
+        : "mao"
+      : "mao";
 
   const maoBotClasse =
     faseRodada === "mostrarResultado"
       ? vencedor === "bot"
-        ? "mao bot win"
-        : "mao bot lose"
-      : "mao bot";
+        ? "mao win"
+        : vencedor === "jogador"
+        ? "mao lose"
+        : "mao"
+      : "mao";
 
   return (
     <div className="arena">
@@ -41,8 +55,13 @@ export default function Arena({
 
       {faseRodada === "mostrarResultado" && (
         <div className="maos">
-          <div className={maoJogadorClasse}>{escolhaJogador}</div>
-          <div className={maoBotClasse}>{escolhaOponente}</div>
+          <div className={maoJogadorClasse}>
+            {renderMao(escolhaJogador)}
+          </div>
+
+          <div className={maoBotClasse}>
+            {renderMao(escolhaOponente)}
+          </div>
         </div>
       )}
     </div>

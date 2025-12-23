@@ -5,6 +5,7 @@
   justify-content: center;
 }
 
+/* JO KEN PO */
 .jokenpo {
   font-size: 3rem;
   font-weight: bold;
@@ -24,6 +25,7 @@
   transform: scale(1.2);
 }
 
+/* MÃOS */
 .maos {
   display: flex;
   gap: 80px;
@@ -32,9 +34,23 @@
 
 .mao {
   font-size: 4rem;
-  display: inline-block;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
+.mao-emoji {
+  font-size: 4rem;
+}
+
+/* imagem da pedra */
+.mao-img {
+  width: 90px;
+  height: 90px;
+  object-fit: contain;
+}
+
+/* animações */
 .mao.win {
   animation: glow 1s infinite alternate;
 }
@@ -44,8 +60,12 @@
 }
 
 @keyframes glow {
-  from { text-shadow: 0 0 10px #22c55e; }
-  to { text-shadow: 0 0 25px #22c55e; }
+  from {
+    box-shadow: 0 0 10px #22c55e;
+  }
+  to {
+    box-shadow: 0 0 25px #22c55e;
+  }
 }
 
 @keyframes shake {
