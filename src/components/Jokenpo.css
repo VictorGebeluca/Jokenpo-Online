@@ -1,0 +1,38 @@
+.jokenpo-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  z-index: 10;
+}
+
+.jokenpo-texto {
+  font-size: 3.2rem;
+  font-weight: bold;
+  color: #fff;
+  opacity: 0;
+  animation: aparecer 0.3s ease forwards;
+}
+
+.delay1 {
+  animation-delay: 0.35s;
+}
+
+.delay2 {
+  animation-delay: 0.7s;
+  color: #ffd700;
+}
+
+@keyframes aparecer {
+  from {
+    transform: scale(0.7);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
