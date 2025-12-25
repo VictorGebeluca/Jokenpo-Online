@@ -23,10 +23,12 @@ function renderMao(escolha: Escolha | null, lado: "jogador" | "oponente") {
 export default function Arena({ escolhaJogador, escolhaOponente }: Props) {
   return (
     <div className="arena">
-      <div className="maos">
+      <div className="arena-inner">
         <div className="mao">
           {renderMao(escolhaJogador, "jogador")}
         </div>
+
+        <div className="vs">VS</div>
 
         <div className="mao">
           {renderMao(escolhaOponente, "oponente")}

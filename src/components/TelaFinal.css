@@ -1,0 +1,109 @@
+.tela-final {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  z-index: 1000;
+  overflow: hidden;
+  padding-bottom: 40px;
+}
+
+/* Conteúdo central */
+.conteudo-central {
+  margin-top: auto;
+  margin-bottom: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+  z-index: 2;
+}
+
+/* 🏆 Imagem */
+.trofeu {
+  width: 170px;
+  max-width: 70%;
+}
+
+/* Texto */
+.winner-text {
+  font-size: 2.6rem;
+  font-weight: 900;
+  letter-spacing: 2px;
+  text-align: center;
+}
+
+/* 🔘 Botão */
+.btn-reiniciar {
+  width: 80%;
+  max-width: 360px;
+  padding: 18px 0;
+  font-size: 1.2rem;
+  font-weight: 900;
+  border: none;
+  border-radius: 14px;
+  cursor: pointer;
+
+  background: linear-gradient(135deg, #facc15, #eab308);
+  color: #000;
+
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.btn-reiniciar:hover {
+  transform: scale(1.05);
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.35);
+}
+
+/* ===== ANIMAÇÕES ===== */
+
+.animar-entrada {
+  animation: trofeu-entrada 0.8s ease-out forwards;
+}
+
+.animar-texto {
+  animation: texto-fade 1s ease forwards;
+  animation-delay: 0.4s;
+  opacity: 0;
+}
+
+@keyframes trofeu-entrada {
+  from {
+    transform: scale(0.3) translateY(40px);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1) translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes texto-fade {
+  to {
+    opacity: 1;
+  }
+}
+
+/* 🎉 Confetes */
+
+.confete {
+  position: absolute;
+  top: 0;
+  opacity: 0.8;
+  border-radius: 50%;
+  animation: cair 3s linear forwards;
+  z-index: 1;
+}
+
+@keyframes cair {
+  0% {
+    transform: translateY(0) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(100vh) rotate(360deg);
+    opacity: 0;
+  }
+}

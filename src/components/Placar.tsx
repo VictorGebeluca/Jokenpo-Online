@@ -6,16 +6,32 @@ interface Props {
 }
 
 export default function Placar({ pontosJogador, pontosBot }: Props) {
+  const total = 3;
+
   return (
     <div className="placar">
-      <div className="lado">
+      <div className="lado jogador">
         <span className="nome">VOCÊ</span>
-        <span className="pontos">{pontosJogador}</span>
+        <div className="bolinhas">
+          {Array.from({ length: total }).map((_, i) => (
+            <span
+              key={i}
+              className={`bolinha ${i < pontosJogador ? "ativa" : ""}`}
+            />
+          ))}
+        </div>
       </div>
-      <span className="vs">VS</span>
-      <div className="lado">
+
+      <div className="lado bot">
         <span className="nome">BOT</span>
-        <span className="pontos">{pontosBot}</span>
+        <div className="bolinhas">
+          {Array.from({ length: total }).map((_, i) => (
+            <span
+              key={i}
+              className={`bolinha ${i < pontosBot ? "ativa" : ""}`}
+            />
+          ))}
+        </div>
       </div>
     </div>
   );

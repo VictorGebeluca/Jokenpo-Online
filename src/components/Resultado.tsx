@@ -61,3 +61,4 @@ export default function Resultado({ jogador, bot }: Props) {
     </div>
   );
 }
+

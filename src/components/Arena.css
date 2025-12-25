@@ -4,17 +4,51 @@
   margin: 30px 0;
 }
 
-.maos {
+/* Caixa principal cartoon */
+.arena-inner {
+  position: relative;
+  width: 90%;
+  max-width: 420px;
+  height: 220px;
+
+  background: #fde68a; /* amarelo cartoon */
+  border: 5px solid #111;
+  border-radius: 26px;
+
   display: flex;
-  gap: 60px;
+  align-items: center;
+  justify-content: space-between;
+
+  padding: 20px;
+
+  box-shadow: 0 10px 0 #111;
 }
 
+/* Pattern leve (pontinhos) */
+.arena-inner::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(#000 1px, transparent 1px);
+  background-size: 20px 20px;
+  opacity: 0.06;
+  pointer-events: none;
+}
+
+/* Área de cada mão */
 .mao {
-  width: 100px;
-  height: 100px;
+  width: 110px;
+  height: 110px;
+
+  background: #fff;
+  border: 4px solid #111;
+  border-radius: 22px;
+
   display: flex;
   align-items: center;
   justify-content: center;
+
+  box-shadow: 0 6px 0 #111;
 }
 
 /* Imagem da mão */
@@ -31,6 +65,25 @@
   opacity: 0.5;
 }
 
+/* VS central */
+.vs {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%) rotate(-8deg);
+
+  background: #f87171;
+  color: #000;
+  border: 4px solid #111;
+  border-radius: 14px;
+  padding: 6px 14px;
+
+  font-weight: 900;
+  font-size: 1.1rem;
+
+  box-shadow: 0 4px 0 #111;
+}
+
 /* ===== ANIMAÇÕES ===== */
 
 .animacao-jogador {
@@ -43,22 +96,28 @@
 
 @keyframes entrar-esquerda {
   from {
-    transform: translateX(-40px) scale(0.9);
+    transform: translateX(-40px) scale(0.6);
     opacity: 0;
   }
+  70% {
+    transform: translateX(0) scale(1.1);
+  }
   to {
-    transform: translateX(0) scale(1);
+    transform: scale(1);
     opacity: 1;
   }
 }
 
 @keyframes entrar-direita {
   from {
-    transform: translateX(40px) scale(0.9);
+    transform: translateX(40px) scale(0.6);
     opacity: 0;
   }
+  70% {
+    transform: translateX(0) scale(1.1);
+  }
   to {
-    transform: translateX(0) scale(1);
+    transform: scale(1);
     opacity: 1;
   }
 }
