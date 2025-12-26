@@ -3,17 +3,31 @@
   position: relative;
   display: flex;
   flex-direction: column;
-  background: linear-gradient(180deg, #0f172a, #020617);
-  color: white;
+
+  /* 🎨 FUNDO CARTOON */
+  background-color: #bae6fd; /* azul alegre */
+
+  /* pattern de bolinhas estilo brinquedo */
+  background-image: radial-gradient(
+    rgba(0, 0, 0, 0.12) 1.5px,
+    transparent 1.5px
+  );
+  background-size: 26px 26px;
+  background-position: center;
+
+  color: #0f172a;
 }
 
-
-/* topo */
+/* ===================== */
+/* TOPO – PLACAR */
+/* ===================== */
 .jogo-container > .placar {
   margin: 16px;
 }
 
-/* centro */
+/* ===================== */
+/* CENTRO – ARENA */
+/* ===================== */
 .jogo-container > .arena {
   flex: 1;
   display: flex;
@@ -21,36 +35,52 @@
   align-items: center;
 }
 
-/* bottom */
+/* ===================== */
+/* BOTTOM – BARRA */
+/* ===================== */
 .jogo-container > .barra {
   margin-bottom: 20px;
 }
-/* Overlay de fim */
+
+/* ===================== */
+/* OVERLAY FINAL */
+/* ===================== */
 .overlay-fim {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.8);
+
+  /* mais claro, estilo jogo infantil */
+  background: rgba(15, 23, 42, 0.6);
+
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
+
   z-index: 200;
   gap: 20px;
   padding: 20px;
   text-align: center;
 }
 
-/* Título de vitória/derrota */
+/* ===================== */
+/* TÍTULO FINAL */
+/* ===================== */
 .titulo-fim {
   font-size: 3rem;
   font-weight: 900;
-  color: #fff;
+  color: #ffffff;
+
   text-transform: uppercase;
   letter-spacing: 2px;
+
+  text-shadow:
+    0 3px 0 #0f172a,
+    0 6px 12px rgba(0, 0, 0, 0.4);
+
   animation: titulo-pop 0.8s ease forwards;
 }
 
-/* Animação do título */
 @keyframes titulo-pop {
   0% {
     transform: scale(0.3);
@@ -71,11 +101,16 @@
   }
 }
 
-/* Troféu central */
+/* ===================== */
+/* TROFÉU */
+/* ===================== */
 .trofeu-fim {
   width: 200px;
   max-width: 50vw;
   height: auto;
+
+  filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.35));
+
   animation: trofeu-pop 1s ease forwards;
 }
 
@@ -93,7 +128,9 @@
   }
 }
 
-/* Vídeo de fogos */
+/* ===================== */
+/* FOGOS (SE USAR) */
+/* ===================== */
 .fogos-fim {
   position: absolute;
   inset: 0;
@@ -101,30 +138,52 @@
   height: 100%;
   object-fit: cover;
   z-index: 50;
-  pointer-events: none; /* deixa overlay clicável no botão */
+  pointer-events: none;
 }
 
-/* Botão reiniciar */
+/* ===================== */
+/* BOTÃO REINICIAR */
+/* ===================== */
 .btn-reiniciar {
-  margin-top: 20px;
-  padding: 12px 28px;
-  font-size: 1.2rem;
-  font-weight: bold;
-  color: #fff;
+  margin-top: 28px;
+
+  padding: 16px 36px;
+  font-size: 1.3rem;
+  font-weight: 900;
+
+  color: #ffffff;
+
   background: linear-gradient(135deg, #22c55e, #16a34a);
+
   border: none;
-  border-radius: 12px;
+  border-radius: 16px;
+
   cursor: pointer;
-  box-shadow: 0 6px 15px rgba(34, 197, 94, 0.6);
-  transition: all 0.2s ease;
+
+  box-shadow:
+    0 6px 0 #15803d,
+    0 10px 20px rgba(34, 197, 94, 0.6);
+
+  transition: all 0.15s ease;
 }
 
 .btn-reiniciar:hover {
-  transform: scale(1.05);
-  box-shadow: 0 8px 20px rgba(34, 197, 94, 0.8);
+  transform: translateY(-2px) scale(1.05);
+  box-shadow:
+    0 8px 0 #15803d,
+    0 14px 26px rgba(34, 197, 94, 0.8);
 }
 
-/* Responsivo */
+.btn-reiniciar:active {
+  transform: translateY(2px);
+  box-shadow:
+    0 3px 0 #15803d,
+    0 6px 12px rgba(34, 197, 94, 0.6);
+}
+
+/* ===================== */
+/* RESPONSIVO */
+/* ===================== */
 @media (max-width: 480px) {
   .titulo-fim {
     font-size: 2.2rem;
@@ -135,7 +194,7 @@
   }
 
   .btn-reiniciar {
-    font-size: 1rem;
-    padding: 10px 22px;
+    font-size: 1.1rem;
+    padding: 14px 28px;
   }
 }

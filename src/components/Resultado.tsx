@@ -14,22 +14,23 @@ interface Confete {
 export default function Resultado({ jogador, bot }: Props) {
   const [confetes, setConfetes] = useState<Confete[]>([]);
 
-  let texto = "EMPATE!";
+  let texto = "Empate";
   let classe = "empate";
 
-  if (
+  const jogadorVenceu =
     (jogador === "pedra" && bot === "tesoura") ||
     (jogador === "papel" && bot === "pedra") ||
-    (jogador === "tesoura" && bot === "papel")
-  ) {
-    texto = "VENCEU!";
+    (jogador === "tesoura" && bot === "papel");
+
+  if (jogadorVenceu) {
+    texto = "Você venceu";
     classe = "vitoria";
   } else if (jogador !== bot) {
-    texto = "PERDEU!";
+    texto = "Você perdeu";
     classe = "derrota";
   }
 
-  // cria confetes se vitória
+  // 🎉 Confetes — mantém igual ao que você gostava
   useEffect(() => {
     if (classe === "vitoria") {
       const novosConfetes: Confete[] = Array.from({ length: 30 }).map((_, i) => ({
@@ -42,23 +43,23 @@ export default function Resultado({ jogador, bot }: Props) {
           height: `${Math.random() * 8 + 4}px`,
         },
       }));
+
       setConfetes(novosConfetes);
 
-      const timer = setTimeout(() => setConfetes([]), 3000); // remove confetes após 3s
+      const timer = setTimeout(() => setConfetes([]), 3000);
       return () => clearTimeout(timer);
     }
   }, [classe]);
 
   return (
-    <div className="resultado-backdrop">
-      <div className={`resultado-card ${classe}`}>
+    <div className="resultado-layer">
+      <div className={`resultado-texto ${classe}`}>
         {texto}
       </div>
 
       {confetes.map((c) => (
-        <div key={c.id} className="confete" style={c.style}></div>
+        <div key={c.id} className="confete" style={c.style} />
       ))}
     </div>
   );
 }
-

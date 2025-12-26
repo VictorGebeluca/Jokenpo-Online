@@ -1,49 +1,89 @@
 import { useState } from "react";
+
 import Arena from "../components/Arena";
 import Placar from "../components/Placar";
 import Resultado from "../components/Resultado";
 import BarraEscolhas from "../components/BarraEscolhas";
 import Jokenpo from "../components/Jokenpo";
 import TelaFinal from "../components/TelaFinal";
+import Menu from "../components/Menu";
+
 import type { Escolha } from "../types/jogo";
+import { useSound } from "../../public/sounds/useSound";
+
 import "./Jogo.css";
 
 type Vencedor = "jogador" | "bot";
+type Tela = "menu" | "jogo";
 
 export default function Jogo() {
+  /* ===================== */
+  /* TELAS */
+  /* ===================== */
+  const [tela, setTela] = useState<Tela>("menu");
+  const [audioLiberado, setAudioLiberado] = useState(false);
+
+  /* ===================== */
+  /* JOGO */
+  /* ===================== */
   const [escolhaJogador, setEscolhaJogador] = useState<Escolha | null>(null);
   const [escolhaBot, setEscolhaBot] = useState<Escolha | null>(null);
 
   const [mostrarJokenpo, setMostrarJokenpo] = useState(false);
   const [mostrarResultado, setMostrarResultado] = useState(false);
 
-  // pontos REAIS (lógica)
   const [pontosJogador, setPontosJogador] = useState(0);
   const [pontosBot, setPontosBot] = useState(0);
 
-  // pontos VISUAIS (placar)
   const [pontosJogadorVisivel, setPontosJogadorVisivel] = useState(0);
   const [pontosBotVisivel, setPontosBotVisivel] = useState(0);
 
   const [finalizado, setFinalizado] = useState(false);
   const [vencedor, setVencedor] = useState<Vencedor>("jogador");
 
+  /* ===================== */
+  /* SOM */
+  /* ===================== */
+  const { playButton, startMusic } = useSound();
+
+  /* ===================== */
+  /* AUDIO GATE */
+  /* ===================== */
+  function ativarAudio() {
+    startMusic(); // 🎵 música começa no primeiro clique
+    setAudioLiberado(true);
+  }
+
+  /* ===================== */
+  /* MENU -> JOGO */
+  /* ===================== */
+  function iniciarJogoBot() {
+    if (!audioLiberado) return;
+
+    playButton();
+    setTela("jogo");
+  }
+
+  /* ===================== */
+  /* LÓGICA DO JOGO */
+  /* ===================== */
   function jogar(escolha: Escolha) {
     if (finalizado || mostrarJokenpo || mostrarResultado) return;
+
+    playButton();
 
     const opcoes: Escolha[] = ["pedra", "papel", "tesoura"];
     const bot = opcoes[Math.floor(Math.random() * opcoes.length)];
 
-    // reset visual
     setMostrarResultado(false);
     setEscolhaJogador(null);
     setEscolhaBot(null);
 
-    // 1️⃣ Jokenpô
+    /* 1️⃣ JOKENPÔ */
     setMostrarJokenpo(true);
 
     setTimeout(() => {
-      // 2️⃣ Revela mãos
+      /* 2️⃣ MOSTRA AS MÃOS */
       setMostrarJokenpo(false);
       setEscolhaJogador(escolha);
       setEscolhaBot(bot);
@@ -58,42 +98,41 @@ export default function Jogo() {
         (bot === "papel" && escolha === "pedra") ||
         (bot === "tesoura" && escolha === "papel");
 
-      // calcula pontos localmente (seguro)
-      let novoPontosJogador = pontosJogador;
-      let novoPontosBot = pontosBot;
+      let novoJogador = pontosJogador;
+      let novoBot = pontosBot;
 
-      if (jogadorVenceu) novoPontosJogador++;
-      if (botVenceu) novoPontosBot++;
+      if (jogadorVenceu) novoJogador++;
+      if (botVenceu) novoBot++;
 
-      // aplica pontos REAIS
-      setPontosJogador(novoPontosJogador);
-      setPontosBot(novoPontosBot);
+      setPontosJogador(novoJogador);
+      setPontosBot(novoBot);
 
-      // 3️⃣ Mostra resultado
+      /* 3️⃣ RESULTADO */
       setTimeout(() => {
         setMostrarResultado(true);
+        setPontosJogadorVisivel(novoJogador);
+        setPontosBotVisivel(novoBot);
 
-        // 4️⃣ AGORA sim atualiza placar visual (não cagueta)
-        setPontosJogadorVisivel(novoPontosJogador);
-        setPontosBotVisivel(novoPontosBot);
-
-        // 5️⃣ Verifica fim (primeiro a 3)
-        if (novoPontosJogador === 3 || novoPontosBot === 3) {
-          setVencedor(novoPontosJogador === 3 ? "jogador" : "bot");
-          setTimeout(() => setFinalizado(true), 800);
+        /* 4️⃣ FIM DE JOGO */
+        if (novoJogador === 3 || novoBot === 3) {
+          setVencedor(novoJogador === 3 ? "jogador" : "bot");
+          setTimeout(() => setFinalizado(true), 1200);
           return;
         }
 
-        // próxima rodada
+        /* 5️⃣ LIMPA PARA PRÓXIMA RODADA */
         setTimeout(() => {
           setMostrarResultado(false);
           setEscolhaJogador(null);
           setEscolhaBot(null);
-        }, 1800);
-      }, 600);
-    }, 1100);
+        }, 2600);
+      }, 1200);
+    }, 2600);
   }
 
+  /* ===================== */
+  /* REINICIAR */
+  /* ===================== */
   function reiniciarJogo() {
     setFinalizado(false);
     setPontosJogador(0);
@@ -106,16 +145,26 @@ export default function Jogo() {
     setMostrarJokenpo(false);
   }
 
-  // 🔚 Tela final
-  if (finalizado) {
+  /* ===================== */
+  /* TELAS */
+  /* ===================== */
+  if (tela === "menu") {
     return (
-      <TelaFinal
-        vencedor={vencedor}
-        onReiniciar={reiniciarJogo}
+      <Menu
+        onJogarBot={iniciarJogoBot}
+        onAtivarAudio={ativarAudio}
+        audioLiberado={audioLiberado}
       />
     );
   }
 
+  if (finalizado) {
+    return <TelaFinal vencedor={vencedor} onReiniciar={reiniciarJogo} />;
+  }
+
+  /* ===================== */
+  /* JOGO */
+  /* ===================== */
   return (
     <div className="jogo-container">
       <Placar

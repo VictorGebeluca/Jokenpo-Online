@@ -1,23 +1,64 @@
 .barra {
   display: flex;
-  justify-content: space-around;
-  align-items: center;
-  background: #020617;
-  padding: 16px 0;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  justify-content: center;
+  gap: 24px;
+
+  padding: 16px;
+
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(6px);
+
+  border-top: 3px solid rgba(0, 0, 0, 0.1);
 }
 
+/* BOTÕES */
 .barra button {
-  background: none;
-  border: none;
-  cursor: pointer;
-}
-
-.barra img {
   width: 90px;
-  transition: transform 0.15s ease;
+  height: 90px;
+
+  background: #ffffff;
+  border: 3px solid #e5e7eb;
+  border-radius: 50%;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  cursor: pointer;
+
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
 }
 
-.barra img:active {
+/* Hover leve */
+.barra button:hover {
+  transform: translateY(-4px);
+}
+
+/* Clique */
+.barra button:active {
   transform: scale(0.9);
+  box-shadow: inset 0 0 0 4px rgba(0, 0, 0, 0.05);
+}
+
+/* Imagem */
+.barra img {
+  width: 56px;
+  height: auto;
+  pointer-events: none;
+}
+
+/* Mobile */
+@media (max-width: 480px) {
+  .barra {
+    gap: 16px;
+  }
+
+  .barra button {
+    width: 72px;
+    height: 72px;
+  }
+
+  .barra img {
+    width: 44px;
+  }
 }

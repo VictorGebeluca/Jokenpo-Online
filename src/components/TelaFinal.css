@@ -1,64 +1,125 @@
 .tela-final {
   position: fixed;
   inset: 0;
+
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: space-between;
+
   z-index: 1000;
-  overflow: hidden;
   padding-bottom: 40px;
+
+  /* 🟡 FUNDO IGUAL AO JOGO */
+  background-color: #bae6fd;
+  background-image: radial-gradient(
+    rgba(0, 0, 0, 0.12) 1.5px,
+    transparent 1.5px
+  );
+  background-size: 26px 26px;
 }
 
-/* Conteúdo central */
+/* ========================= */
+/* CAIXA CENTRAL (IGUAL ARENA) */
+/* ========================= */
 .conteudo-central {
-  margin-top: auto;
-  margin-bottom: auto;
+  position: relative;
+
+  width: 90%;
+  max-width: 420px;
+  padding: 32px 24px;
+
+  background: #fde68a;
+  border: 5px solid #111;
+  border-radius: 26px;
+
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 24px;
+
+  box-shadow: 0 10px 0 #111;
+
+  /* 🔑 CENTRALIZA NO MEIO */
+  margin-top: auto;
+  margin-bottom: auto;
+
   z-index: 2;
 }
 
-/* 🏆 Imagem */
+/* Pattern interno igual arena */
+.conteudo-central::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+
+  background-image: radial-gradient(#000 1px, transparent 1px);
+  background-size: 20px 20px;
+  opacity: 0.06;
+
+  pointer-events: none;
+}
+
+/* ========================= */
+/* 🏆 TROFÉU */
+/* ========================= */
 .trofeu {
   width: 170px;
   max-width: 70%;
+  z-index: 2;
 }
 
-/* Texto */
+/* ========================= */
+/* TEXTO VENCEDOR */
+/* ========================= */
 .winner-text {
   font-size: 2.6rem;
   font-weight: 900;
   letter-spacing: 2px;
   text-align: center;
+
+  color: #111;
+  z-index: 2;
 }
 
-/* 🔘 Botão */
+/* ========================= */
+/* 🔘 BOTÃO EMBAIXO */
+/* ========================= */
 .btn-reiniciar {
   width: 80%;
   max-width: 360px;
+
+  margin-bottom: 0;
+
   padding: 18px 0;
   font-size: 1.2rem;
   font-weight: 900;
-  border: none;
+
+  border: 4px solid #111;
   border-radius: 14px;
   cursor: pointer;
 
   background: linear-gradient(135deg, #facc15, #eab308);
   color: #000;
 
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: 0 6px 0 #111;
+
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 
 .btn-reiniciar:hover {
-  transform: scale(1.05);
-  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.35);
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 0 8px 0 #111;
 }
 
-/* ===== ANIMAÇÕES ===== */
+.btn-reiniciar:active {
+  transform: translateY(2px);
+  box-shadow: 0 3px 0 #111;
+}
 
+/* ========================= */
+/* ANIMAÇÕES */
+/* ========================= */
 .animar-entrada {
   animation: trofeu-entrada 0.8s ease-out forwards;
 }
@@ -86,16 +147,23 @@
   }
 }
 
-/* 🎉 Confetes */
-
+/* ========================= */
+/* 🎉 CONFETES */
+/* ========================= */
+/* CONFETES POR CIMA DE TUDO */
 .confete {
   position: absolute;
   top: 0;
-  opacity: 0.8;
+
+  opacity: 0.9;
   border-radius: 50%;
+
   animation: cair 3s linear forwards;
-  z-index: 1;
+
+  z-index: 5; /* ⬅️ MAIOR que o troféu */
+  pointer-events: none; /* não bloqueia clique */
 }
+
 
 @keyframes cair {
   0% {
@@ -105,5 +173,18 @@
   100% {
     transform: translateY(100vh) rotate(360deg);
     opacity: 0;
+  }
+}
+
+/* ========================= */
+/* RESPONSIVO */
+/* ========================= */
+@media (max-width: 480px) {
+  .winner-text {
+    font-size: 2.1rem;
+  }
+
+  .trofeu {
+    width: 140px;
   }
 }

@@ -1,0 +1,107 @@
+.menu {
+  position: relative;
+  min-height: 100vh;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 48px;
+
+  background-color: #bae6fd;
+  background-image: radial-gradient(
+    rgba(0, 0, 0, 0.12) 1.5px,
+    transparent 1.5px
+  );
+  background-size: 26px 26px;
+}
+
+/* ===================== */
+/* TÍTULO */
+/* ===================== */
+.menu-titulo {
+  font-size: 3rem;
+  font-weight: 900;
+  letter-spacing: 4px;
+  color: #111;
+}
+
+/* ===================== */
+/* BOTÕES */
+/* ===================== */
+.menu-botoes {
+  width: 80%;
+  max-width: 320px;
+
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.menu-btn {
+  padding: 18px;
+  font-size: 1.2rem;
+  font-weight: 900;
+
+  border: 4px solid #111;
+  border-radius: 14px;
+
+  background: #fde68a;
+  box-shadow: 0 6px 0 #111;
+
+  cursor: pointer;
+  transition: transform 0.15s ease;
+}
+
+.menu-btn:active {
+  transform: translateY(3px);
+  box-shadow: 0 3px 0 #111;
+}
+
+.menu-btn.disabled,
+.menu-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ===================== */
+/* OVERLAY PRESS START */
+/* ===================== */
+.overlay-start {
+  position: absolute;
+  inset: 0;
+  z-index: 50;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: rgba(15, 23, 42, 0.55);
+  backdrop-filter: blur(2px);
+
+  cursor: pointer;
+}
+
+.overlay-content {
+  text-align: center;
+  color: #fff;
+  animation: piscar 1.4s infinite;
+}
+
+.overlay-content h2 {
+  font-size: 2.4rem;
+  font-weight: 900;
+  letter-spacing: 3px;
+}
+
+.overlay-content p {
+  margin-top: 12px;
+  font-size: 1.2rem;
+  opacity: 0.9;
+}
+
+@keyframes piscar {
+  0% { opacity: 1; }
+  50% { opacity: 0.4; }
+  100% { opacity: 1; }
+}

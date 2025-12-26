@@ -1,7 +1,8 @@
 import "./BarraEscolhas.css";
+import type { Escolha } from "../types/jogo";
 
 interface Props {
-  onEscolher: (escolha: "pedra" | "papel" | "tesoura") => void;
+  onEscolher: (escolha: Escolha) => void;
 }
 
 export default function BarraEscolhas({ onEscolher }: Props) {
