@@ -17,15 +17,9 @@ type Vencedor = "jogador" | "bot";
 type Tela = "menu" | "jogo";
 
 export default function Jogo() {
-  /* ===================== */
-  /* TELAS */
-  /* ===================== */
   const [tela, setTela] = useState<Tela>("menu");
   const [audioLiberado, setAudioLiberado] = useState(false);
 
-  /* ===================== */
-  /* JOGO */
-  /* ===================== */
   const [escolhaJogador, setEscolhaJogador] = useState<Escolha | null>(null);
   const [escolhaBot, setEscolhaBot] = useState<Escolha | null>(null);
 
@@ -41,98 +35,92 @@ export default function Jogo() {
   const [finalizado, setFinalizado] = useState(false);
   const [vencedor, setVencedor] = useState<Vencedor>("jogador");
 
-  /* ===================== */
-  /* SOM */
-  /* ===================== */
-  const { playButton, startMusic } = useSound();
+  const {
+    playButton,
+    playDrums,
+    playWinner,
+    playLoser,
+    startMusic,
+  } = useSound();
 
-  /* ===================== */
-  /* AUDIO GATE */
-  /* ===================== */
   function ativarAudio() {
-    startMusic(); // 🎵 música começa no primeiro clique
+    startMusic();
     setAudioLiberado(true);
   }
 
-  /* ===================== */
-  /* MENU -> JOGO */
-  /* ===================== */
   function iniciarJogoBot() {
     if (!audioLiberado) return;
-
     playButton();
-    setTela("jogo");
+    setTimeout(() => setTela("jogo"), 200);
   }
 
-  /* ===================== */
-  /* LÓGICA DO JOGO */
-  /* ===================== */
   function jogar(escolha: Escolha) {
     if (finalizado || mostrarJokenpo || mostrarResultado) return;
 
     playButton();
 
-    const opcoes: Escolha[] = ["pedra", "papel", "tesoura"];
-    const bot = opcoes[Math.floor(Math.random() * opcoes.length)];
-
-    setMostrarResultado(false);
-    setEscolhaJogador(null);
-    setEscolhaBot(null);
-
-    /* 1️⃣ JOKENPÔ */
-    setMostrarJokenpo(true);
-
     setTimeout(() => {
-      /* 2️⃣ MOSTRA AS MÃOS */
-      setMostrarJokenpo(false);
-      setEscolhaJogador(escolha);
-      setEscolhaBot(bot);
+      const opcoes: Escolha[] = ["pedra", "papel", "tesoura"];
+      const bot = opcoes[Math.floor(Math.random() * opcoes.length)];
 
-      const jogadorVenceu =
-        (escolha === "pedra" && bot === "tesoura") ||
-        (escolha === "papel" && bot === "pedra") ||
-        (escolha === "tesoura" && bot === "papel");
+      setMostrarResultado(false);
+      setEscolhaJogador(null);
+      setEscolhaBot(null);
 
-      const botVenceu =
-        (bot === "pedra" && escolha === "tesoura") ||
-        (bot === "papel" && escolha === "pedra") ||
-        (bot === "tesoura" && escolha === "papel");
+      /* 🥁 JOKENPÔ */
+      setMostrarJokenpo(true);
+      playDrums();
 
-      let novoJogador = pontosJogador;
-      let novoBot = pontosBot;
-
-      if (jogadorVenceu) novoJogador++;
-      if (botVenceu) novoBot++;
-
-      setPontosJogador(novoJogador);
-      setPontosBot(novoBot);
-
-      /* 3️⃣ RESULTADO */
       setTimeout(() => {
-        setMostrarResultado(true);
-        setPontosJogadorVisivel(novoJogador);
-        setPontosBotVisivel(novoBot);
+        setMostrarJokenpo(false);
+        setEscolhaJogador(escolha);
+        setEscolhaBot(bot);
 
-        /* 4️⃣ FIM DE JOGO */
-        if (novoJogador === 3 || novoBot === 3) {
-          setVencedor(novoJogador === 3 ? "jogador" : "bot");
-          setTimeout(() => setFinalizado(true), 1200);
-          return;
+        const jogadorVenceu =
+          (escolha === "pedra" && bot === "tesoura") ||
+          (escolha === "papel" && bot === "pedra") ||
+          (escolha === "tesoura" && bot === "papel");
+
+        const botVenceu =
+          (bot === "pedra" && escolha === "tesoura") ||
+          (bot === "papel" && escolha === "pedra") ||
+          (bot === "tesoura" && escolha === "papel");
+
+        let novoJogador = pontosJogador;
+        let novoBot = pontosBot;
+
+        if (jogadorVenceu) {
+          novoJogador++;
+          playWinner();
+        } else if (botVenceu) {
+          novoBot++;
+          playLoser();
         }
 
-        /* 5️⃣ LIMPA PARA PRÓXIMA RODADA */
+        setPontosJogador(novoJogador);
+        setPontosBot(novoBot);
+
         setTimeout(() => {
-          setMostrarResultado(false);
-          setEscolhaJogador(null);
-          setEscolhaBot(null);
-        }, 2600);
-      }, 1200);
-    }, 2600);
+          setMostrarResultado(true);
+          setPontosJogadorVisivel(novoJogador);
+          setPontosBotVisivel(novoBot);
+
+          if (novoJogador === 3 || novoBot === 3) {
+            setVencedor(novoJogador === 3 ? "jogador" : "bot");
+            setTimeout(() => setFinalizado(true), 1200);
+            return;
+          }
+
+          setTimeout(() => {
+            setMostrarResultado(false);
+            setEscolhaJogador(null);
+            setEscolhaBot(null);
+          }, 2600);
+        }, 1200);
+      }, 2600);
+    }, 180);
   }
 
-  /* ===================== */
-  /* REINICIAR */
-  /* ===================== */
   function reiniciarJogo() {
     setFinalizado(false);
     setPontosJogador(0);
@@ -145,9 +133,6 @@ export default function Jogo() {
     setMostrarJokenpo(false);
   }
 
-  /* ===================== */
-  /* TELAS */
-  /* ===================== */
   if (tela === "menu") {
     return (
       <Menu
@@ -162,9 +147,6 @@ export default function Jogo() {
     return <TelaFinal vencedor={vencedor} onReiniciar={reiniciarJogo} />;
   }
 
-  /* ===================== */
-  /* JOGO */
-  /* ===================== */
   return (
     <div className="jogo-container">
       <Placar
