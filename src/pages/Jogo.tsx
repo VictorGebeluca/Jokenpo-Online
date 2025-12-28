@@ -37,10 +37,9 @@ export default function Jogo() {
   const [finalizado, setFinalizado] = useState(false);
   const [vencedor, setVencedor] = useState<Vencedor>("jogador");
 
-  /* ===== MODAL ===== */
   const [modalAberto, setModalAberto] = useState(false);
 
-  /* ===== CONFIG ===== */
+  /* CONFIG */
   const [musica, setMusica] = useState(true);
   const [efeitos, setEfeitos] = useState(true);
   const [rodadas, setRodadas] = useState(3);
@@ -52,14 +51,19 @@ export default function Jogo() {
     playDrums,
     playWinner,
     playLoser,
-    startMusic,
     toggleMute,
+    unlockAudio,
     isMuted,
+    setMusicEnabled,
+    setEffectsEnabled,
   } = useSound();
 
+  /* ========================= */
+  /* MENU */
+  /* ========================= */
   function ativarAudio() {
-    startMusic();
     setAudioLiberado(true);
+    unlockAudio(); // 🔑 inicia música no gesto do usuário
   }
 
   function iniciarJogoBot() {
@@ -68,6 +72,9 @@ export default function Jogo() {
     setTimeout(() => setTela("jogo"), 200);
   }
 
+  /* ========================= */
+  /* JOGO */
+  /* ========================= */
   function jogar(escolha: Escolha) {
     if (finalizado || mostrarJokenpo || mostrarResultado) return;
 
@@ -146,7 +153,9 @@ export default function Jogo() {
     setMostrarJokenpo(false);
   }
 
-  /* ===== MENU ===== */
+  /* ========================= */
+  /* TELAS */
+  /* ========================= */
   if (tela === "menu") {
     return (
       <>
@@ -166,8 +175,20 @@ export default function Jogo() {
           efeitos={efeitos}
           rodadas={rodadas}
           dificuldade={dificuldade}
-          onToggleMusica={() => setMusica((v) => !v)}
-          onToggleEfeitos={() => setEfeitos((v) => !v)}
+          onToggleMusica={() => {
+            setMusica((v) => {
+              const next = !v;
+              setMusicEnabled(next);
+              return next;
+            });
+          }}
+          onToggleEfeitos={() => {
+            setEfeitos((v) => {
+              const next = !v;
+              setEffectsEnabled(next);
+              return next;
+            });
+          }}
           onChangeRodadas={setRodadas}
           onChangeDificuldade={setDificuldade}
           onFechar={() => setModalAberto(false)}
@@ -180,7 +201,6 @@ export default function Jogo() {
     return <TelaFinal vencedor={vencedor} onReiniciar={reiniciarJogo} />;
   }
 
-  /* ===== JOGO ===== */
   return (
     <div className="jogo-container">
       <TopBar
@@ -217,8 +237,20 @@ export default function Jogo() {
         tipo="jogo"
         musica={musica}
         efeitos={efeitos}
-        onToggleMusica={() => setMusica((v) => !v)}
-        onToggleEfeitos={() => setEfeitos((v) => !v)}
+        onToggleMusica={() => {
+          setMusica((v) => {
+            const next = !v;
+            setMusicEnabled(next);
+            return next;
+          });
+        }}
+        onToggleEfeitos={() => {
+          setEfeitos((v) => {
+            const next = !v;
+            setEffectsEnabled(next);
+            return next;
+          });
+        }}
         onSair={() => {
           setModalAberto(false);
           setTela("menu");

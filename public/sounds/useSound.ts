@@ -8,7 +8,8 @@ export function useSound() {
   const loserSound = useRef<HTMLAudioElement | null>(null);
 
   const [isMuted, setIsMuted] = useState(false);
-  const [musicStarted, setMusicStarted] = useState(false);
+  const [musicEnabled, setMusicEnabled] = useState(true);
+  const [effectsEnabled, setEffectsEnabled] = useState(true);
 
   /* ========================= */
   /* INIT */
@@ -40,57 +41,63 @@ export function useSound() {
   }, []);
 
   /* ========================= */
+  /* MUSIC — CONTROLADA POR ESTADO */
+  /* ========================= */
+  useEffect(() => {
+    if (!musicSound.current) return;
+
+    if (isMuted || !musicEnabled) {
+      musicSound.current.pause();
+      musicSound.current.currentTime = 0;
+      return;
+    }
+
+    musicSound.current.play().catch(() => {});
+  }, [isMuted, musicEnabled]);
+
+  /* ========================= */
   /* FX */
   /* ========================= */
   function playButton() {
-    if (isMuted || !buttonSound.current) return;
+    if (isMuted || !effectsEnabled || !buttonSound.current) return;
     buttonSound.current.currentTime = 0;
     buttonSound.current.play().catch(() => {});
   }
 
   function playDrums() {
-    if (isMuted || !drumsSound.current) return;
+    if (isMuted || !effectsEnabled || !drumsSound.current) return;
     drumsSound.current.currentTime = 0;
     drumsSound.current.play().catch(() => {});
   }
 
   function playWinner() {
-    if (isMuted || !winnerSound.current) return;
+    if (isMuted || !effectsEnabled || !winnerSound.current) return;
     winnerSound.current.currentTime = 0;
     winnerSound.current.play().catch(() => {});
   }
 
   function playLoser() {
-    if (isMuted || !loserSound.current) return;
+    if (isMuted || !effectsEnabled || !loserSound.current) return;
     loserSound.current.currentTime = 0;
     loserSound.current.play().catch(() => {});
   }
 
   /* ========================= */
-  /* MUSIC */
+  /* MUTE */
   /* ========================= */
-  function startMusic() {
-    if (isMuted || musicStarted || !musicSound.current) return;
-
-    musicSound.current
-      .play()
-      .then(() => setMusicStarted(true))
-      .catch(() => {});
-  }
-
-  function stopMusic() {
-    if (!musicSound.current) return;
-    musicSound.current.pause();
-    musicSound.current.currentTime = 0;
-    setMusicStarted(false);
-  }
-
   function toggleMute() {
-    setIsMuted((prev) => {
-      const next = !prev;
-      if (musicSound.current) musicSound.current.muted = next;
-      return next;
-    });
+    setIsMuted((prev) => !prev);
+  }
+
+  /* ========================= */
+  /* UNLOCK AUDIO (GESTO DO USUÁRIO) */
+  /* ========================= */
+  function unlockAudio() {
+    if (!musicSound.current) return;
+
+    if (!isMuted && musicEnabled) {
+      musicSound.current.play().catch(() => {});
+    }
   }
 
   return {
@@ -98,9 +105,12 @@ export function useSound() {
     playDrums,
     playWinner,
     playLoser,
-    startMusic,
-    stopMusic,
     toggleMute,
+    unlockAudio,
     isMuted,
+    musicEnabled,
+    effectsEnabled,
+    setMusicEnabled,
+    setEffectsEnabled,
   };
 }
