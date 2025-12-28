@@ -22,8 +22,12 @@
 /* TOPO – PLACAR */
 /* ===================== */
 .jogo-container > .placar {
-  margin: 16px;
+  margin-top: 72px; /* espaço para engrenagem */
+  margin-left: 16px;
+  margin-right: 16px;
 }
+
+
 
 /* ===================== */
 /* CENTRO – ARENA */

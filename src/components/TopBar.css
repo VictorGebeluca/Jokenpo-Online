@@ -1,0 +1,36 @@
+.topbar {
+  position: fixed;
+  top: 12px;
+  left: 0;
+  right: 0;
+
+  display: flex;
+  justify-content: space-between;
+  padding: 0 16px;
+
+  z-index: 3000;
+}
+
+/* BOTÕES APENAS ÍCONE */
+.topbar-btn {
+  background: transparent;
+  border: none;
+  padding: 5px;
+
+  font-size: 2.5rem;
+  cursor: pointer;
+
+  line-height: 1;
+  user-select: none;
+
+  transition: transform 0.15s ease, opacity 0.15s ease;
+}
+
+.topbar-btn:hover {
+  transform: scale(1.15);
+  opacity: 0.85;
+}
+
+.topbar-btn:active {
+  transform: scale(0.95);
+}
