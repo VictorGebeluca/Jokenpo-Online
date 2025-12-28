@@ -18,9 +18,12 @@
 }
 
 .bolinhas {
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(3, 1.5fr); /* 🔥 máximo 4 por linha */
   gap: 12px;
+  justify-items: center;
 }
+
 
 .bolinha {
   width: 24px;

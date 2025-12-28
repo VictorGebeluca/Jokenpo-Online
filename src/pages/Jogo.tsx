@@ -40,7 +40,7 @@ export default function Jogo() {
   /* ===== MODAL ===== */
   const [modalAberto, setModalAberto] = useState(false);
 
-  /* ===== CONFIG (placeholder por enquanto) ===== */
+  /* ===== CONFIG ===== */
   const [musica, setMusica] = useState(true);
   const [efeitos, setEfeitos] = useState(true);
   const [rodadas, setRodadas] = useState(3);
@@ -118,8 +118,8 @@ export default function Jogo() {
           setPontosJogadorVisivel(novoJogador);
           setPontosBotVisivel(novoBot);
 
-          if (novoJogador === 3 || novoBot === 3) {
-            setVencedor(novoJogador === 3 ? "jogador" : "bot");
+          if (novoJogador === rodadas || novoBot === rodadas) {
+            setVencedor(novoJogador === rodadas ? "jogador" : "bot");
             setTimeout(() => setFinalizado(true), 1200);
             return;
           }
@@ -156,6 +156,7 @@ export default function Jogo() {
           audioLiberado={audioLiberado}
           isMuted={isMuted}
           onToggleMute={toggleMute}
+          onOpenSettings={() => setModalAberto(true)}
         />
 
         <Modal
@@ -191,6 +192,7 @@ export default function Jogo() {
       <Placar
         pontosJogador={pontosJogadorVisivel}
         pontosBot={pontosBotVisivel}
+        total={rodadas}
       />
 
       {!mostrarJokenpo && (
@@ -215,13 +217,9 @@ export default function Jogo() {
         tipo="jogo"
         musica={musica}
         efeitos={efeitos}
-        rodadas={rodadas}
-        dificuldade={dificuldade}
         onToggleMusica={() => setMusica((v) => !v)}
         onToggleEfeitos={() => setEfeitos((v) => !v)}
-        onChangeRodadas={setRodadas}
-        onChangeDificuldade={setDificuldade}
-        onSairJogo={() => {
+        onSair={() => {
           setModalAberto(false);
           setTela("menu");
         }}

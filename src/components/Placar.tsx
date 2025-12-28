@@ -3,11 +3,14 @@ import "./Placar.css";
 interface Props {
   pontosJogador: number;
   pontosBot: number;
+  total?: number;
 }
 
-export default function Placar({ pontosJogador, pontosBot }: Props) {
-  const total = 3;
-
+export default function Placar({
+  pontosJogador,
+  pontosBot,
+  total = 3, // 🔥 fallback de segurança
+}: Props) {
   return (
     <div className="placar">
       <div className="lado jogador">

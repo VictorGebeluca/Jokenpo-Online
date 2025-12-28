@@ -1,7 +1,5 @@
-import { useState } from "react";
 import "./Menu.css";
 import TopBar from "./topBar";
-import Modal from "./Modal";
 
 interface Props {
   onJogarBot: () => void;
@@ -9,6 +7,7 @@ interface Props {
   audioLiberado: boolean;
   isMuted: boolean;
   onToggleMute: () => void;
+  onOpenSettings: () => void; // ✅ NOVO
 }
 
 export default function Menu({
@@ -17,19 +16,16 @@ export default function Menu({
   audioLiberado,
   isMuted,
   onToggleMute,
+  onOpenSettings,
 }: Props) {
-  const [modalAberto, setModalAberto] = useState(false);
-
   return (
     <div className="menu">
-      {/* ⬆️ TOPBAR — SEM MUDAR LAYOUT */}
       <TopBar
         isMuted={isMuted}
         onToggleMute={onToggleMute}
-        onOpenSettings={() => setModalAberto(true)}
+        onOpenSettings={onOpenSettings} // ✅ agora funciona
       />
 
-      {/* OVERLAY DE ATIVAÇÃO DE ÁUDIO */}
       {!audioLiberado && (
         <div className="overlay-start" onClick={onAtivarAudio}>
           <div className="overlay-content">
@@ -58,13 +54,6 @@ export default function Menu({
           🏆 Ranking
         </button>
       </div>
-
-      {/* 🔧 MODAL — OVERLAY PURO */}
-      <Modal
-        aberto={modalAberto}
-        tipo="menu"
-        onFechar={() => setModalAberto(false)}
-      />
     </div>
   );
 }
