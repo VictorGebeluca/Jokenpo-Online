@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import Arena from "../components/Arena";
 import Placar from "../components/Placar";
@@ -51,6 +51,8 @@ export default function Jogo() {
     playDrums,
     playWinner,
     playLoser,
+    playFinalWin,
+    playFinalLose,
     toggleMute,
     unlockAudio,
     isMuted,
@@ -58,29 +60,20 @@ export default function Jogo() {
     setEffectsEnabled,
   } = useSound();
 
-  /* ========================= */
-  /* RESET GLOBAL DO JOGO */
-  /* ========================= */
-  function resetarJogo() {
-    setFinalizado(false);
-    setVencedor("jogador");
+  /* 🔒 GARANTE SOM FINAL 1 VEZ */
+  const somFinalTocado = useRef(false);
 
-    setPontosJogador(0);
-    setPontosBot(0);
-    setPontosJogadorVisivel(0);
-    setPontosBotVisivel(0);
+  useEffect(() => {
+    if (!finalizado || somFinalTocado.current) return;
 
-    setEscolhaJogador(null);
-    setEscolhaBot(null);
+    somFinalTocado.current = true;
 
-    setMostrarResultado(false);
-    setMostrarJokenpo(false);
-  }
-
-  function voltarParaMenu() {
-    resetarJogo();
-    setTela("menu");
-  }
+    if (vencedor === "jogador") {
+      playFinalWin();
+    } else {
+      playFinalLose();
+    }
+  }, [finalizado, vencedor, playFinalWin, playFinalLose]);
 
   /* ========================= */
   /* MENU */
@@ -93,7 +86,6 @@ export default function Jogo() {
   function iniciarJogoBot() {
     if (!audioLiberado) return;
     playButton();
-    resetarJogo();
     setTimeout(() => setTela("jogo"), 200);
   }
 
@@ -166,6 +158,19 @@ export default function Jogo() {
     }, 200);
   }
 
+  function reiniciarJogo() {
+    somFinalTocado.current = false;
+    setFinalizado(false);
+    setPontosJogador(0);
+    setPontosBot(0);
+    setPontosJogadorVisivel(0);
+    setPontosBotVisivel(0);
+    setEscolhaJogador(null);
+    setEscolhaBot(null);
+    setMostrarResultado(false);
+    setMostrarJokenpo(false);
+  }
+
   /* ========================= */
   /* TELAS */
   /* ========================= */
@@ -214,8 +219,11 @@ export default function Jogo() {
     return (
       <TelaFinal
         vencedor={vencedor}
-        onReiniciar={resetarJogo}
-        onVoltarMenu={voltarParaMenu}
+        onReiniciar={reiniciarJogo}
+        onVoltarMenu={() => {
+          reiniciarJogo();
+          setTela("menu");
+        }}
       />
     );
   }
@@ -271,8 +279,9 @@ export default function Jogo() {
           });
         }}
         onSair={() => {
+          reiniciarJogo();
           setModalAberto(false);
-          voltarParaMenu();
+          setTela("menu");
         }}
         onFechar={() => setModalAberto(false)}
       />

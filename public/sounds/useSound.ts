@@ -6,14 +6,14 @@ export function useSound() {
   const drumsSound = useRef<HTMLAudioElement | null>(null);
   const winnerSound = useRef<HTMLAudioElement | null>(null);
   const loserSound = useRef<HTMLAudioElement | null>(null);
+  const finalWinSound = useRef<HTMLAudioElement | null>(null);
+  const finalLoseSound = useRef<HTMLAudioElement | null>(null);
 
   const [isMuted, setIsMuted] = useState(false);
   const [musicEnabled, setMusicEnabled] = useState(true);
   const [effectsEnabled, setEffectsEnabled] = useState(true);
 
-  /* ========================= */
   /* INIT */
-  /* ========================= */
   useEffect(() => {
     buttonSound.current = new Audio("/sounds/button.mp3");
     buttonSound.current.volume = 0.6;
@@ -31,85 +31,58 @@ export function useSound() {
     loserSound.current = new Audio("/sounds/loser.mp3");
     loserSound.current.volume = 0.8;
 
+    finalWinSound.current = new Audio("/sounds/youWin.mp3");
+    finalWinSound.current.volume = 1;
+
+    finalLoseSound.current = new Audio("/sounds/gameOver.mp3");
+    finalLoseSound.current.volume = 1;
+
     return () => {
-      buttonSound.current?.pause();
-      musicSound.current?.pause();
-      drumsSound.current?.pause();
-      winnerSound.current?.pause();
-      loserSound.current?.pause();
+      [
+        buttonSound,
+        musicSound,
+        drumsSound,
+        winnerSound,
+        loserSound,
+        finalWinSound,
+        finalLoseSound,
+      ].forEach((s) => s.current?.pause());
     };
   }, []);
 
-  /* ========================= */
-  /* MUSIC — CONTROLADA POR ESTADO */
-  /* ========================= */
+  /* MUSIC */
   useEffect(() => {
     if (!musicSound.current) return;
 
     if (isMuted || !musicEnabled) {
       musicSound.current.pause();
-      musicSound.current.currentTime = 0;
       return;
     }
 
     musicSound.current.play().catch(() => {});
   }, [isMuted, musicEnabled]);
 
-  /* ========================= */
   /* FX */
-  /* ========================= */
-  function playButton() {
-    if (isMuted || !effectsEnabled || !buttonSound.current) return;
-    buttonSound.current.currentTime = 0;
-    buttonSound.current.play().catch(() => {});
-  }
-
-  function playDrums() {
-    if (isMuted || !effectsEnabled || !drumsSound.current) return;
-    drumsSound.current.currentTime = 0;
-    drumsSound.current.play().catch(() => {});
-  }
-
-  function playWinner() {
-    if (isMuted || !effectsEnabled || !winnerSound.current) return;
-    winnerSound.current.currentTime = 0;
-    winnerSound.current.play().catch(() => {});
-  }
-
-  function playLoser() {
-    if (isMuted || !effectsEnabled || !loserSound.current) return;
-    loserSound.current.currentTime = 0;
-    loserSound.current.play().catch(() => {});
-  }
-
-  /* ========================= */
-  /* MUTE */
-  /* ========================= */
-  function toggleMute() {
-    setIsMuted((prev) => !prev);
-  }
-
-  /* ========================= */
-  /* UNLOCK AUDIO (GESTO DO USUÁRIO) */
-  /* ========================= */
-  function unlockAudio() {
-    if (!musicSound.current) return;
-
-    if (!isMuted && musicEnabled) {
-      musicSound.current.play().catch(() => {});
-    }
+  function play(sound?: HTMLAudioElement | null) {
+    if (isMuted || !effectsEnabled || !sound) return;
+    sound.currentTime = 0;
+    sound.play().catch(() => {});
   }
 
   return {
-    playButton,
-    playDrums,
-    playWinner,
-    playLoser,
-    toggleMute,
-    unlockAudio,
+    playButton: () => play(buttonSound.current),
+    playDrums: () => play(drumsSound.current),
+    playWinner: () => play(winnerSound.current),
+    playLoser: () => play(loserSound.current),
+    playFinalWin: () => play(finalWinSound.current),
+    playFinalLose: () => play(finalLoseSound.current),
+    toggleMute: () => setIsMuted((v) => !v),
+    unlockAudio: () => {
+      if (!isMuted && musicEnabled) {
+        musicSound.current?.play().catch(() => {});
+      }
+    },
     isMuted,
-    musicEnabled,
-    effectsEnabled,
     setMusicEnabled,
     setEffectsEnabled,
   };
