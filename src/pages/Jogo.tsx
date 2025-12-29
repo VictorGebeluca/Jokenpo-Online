@@ -59,16 +59,41 @@ export default function Jogo() {
   } = useSound();
 
   /* ========================= */
+  /* RESET GLOBAL DO JOGO */
+  /* ========================= */
+  function resetarJogo() {
+    setFinalizado(false);
+    setVencedor("jogador");
+
+    setPontosJogador(0);
+    setPontosBot(0);
+    setPontosJogadorVisivel(0);
+    setPontosBotVisivel(0);
+
+    setEscolhaJogador(null);
+    setEscolhaBot(null);
+
+    setMostrarResultado(false);
+    setMostrarJokenpo(false);
+  }
+
+  function voltarParaMenu() {
+    resetarJogo();
+    setTela("menu");
+  }
+
+  /* ========================= */
   /* MENU */
   /* ========================= */
   function ativarAudio() {
     setAudioLiberado(true);
-    unlockAudio(); // 🔑 inicia música no gesto do usuário
+    unlockAudio();
   }
 
   function iniciarJogoBot() {
     if (!audioLiberado) return;
     playButton();
+    resetarJogo();
     setTimeout(() => setTela("jogo"), 200);
   }
 
@@ -141,18 +166,6 @@ export default function Jogo() {
     }, 200);
   }
 
-  function reiniciarJogo() {
-    setFinalizado(false);
-    setPontosJogador(0);
-    setPontosBot(0);
-    setPontosJogadorVisivel(0);
-    setPontosBotVisivel(0);
-    setEscolhaJogador(null);
-    setEscolhaBot(null);
-    setMostrarResultado(false);
-    setMostrarJokenpo(false);
-  }
-
   /* ========================= */
   /* TELAS */
   /* ========================= */
@@ -198,7 +211,13 @@ export default function Jogo() {
   }
 
   if (finalizado) {
-    return <TelaFinal vencedor={vencedor} onReiniciar={reiniciarJogo} />;
+    return (
+      <TelaFinal
+        vencedor={vencedor}
+        onReiniciar={resetarJogo}
+        onVoltarMenu={voltarParaMenu}
+      />
+    );
   }
 
   return (
@@ -253,7 +272,7 @@ export default function Jogo() {
         }}
         onSair={() => {
           setModalAberto(false);
-          setTela("menu");
+          voltarParaMenu();
         }}
         onFechar={() => setModalAberto(false)}
       />

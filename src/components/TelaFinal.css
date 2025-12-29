@@ -1,3 +1,6 @@
+/* ========================= */
+/* TELA FINAL */
+/* ========================= */
 .tela-final {
   position: fixed;
   inset: 0;
@@ -10,7 +13,7 @@
   z-index: 1000;
   padding-bottom: 40px;
 
-  /* 🟡 FUNDO IGUAL AO JOGO */
+  /* FUNDO IGUAL AO JOGO */
   background-color: #bae6fd;
   background-image: radial-gradient(
     rgba(0, 0, 0, 0.12) 1.5px,
@@ -20,7 +23,7 @@
 }
 
 /* ========================= */
-/* CAIXA CENTRAL (IGUAL ARENA) */
+/* CAIXA CENTRAL */
 /* ========================= */
 .conteudo-central {
   position: relative;
@@ -40,14 +43,13 @@
 
   box-shadow: 0 10px 0 #111;
 
-  /* 🔑 CENTRALIZA NO MEIO */
   margin-top: auto;
   margin-bottom: auto;
 
   z-index: 2;
 }
 
-/* Pattern interno igual arena */
+/* PATTERN INTERNO */
 .conteudo-central::before {
   content: "";
   position: absolute;
@@ -61,7 +63,7 @@
 }
 
 /* ========================= */
-/* 🏆 TROFÉU */
+/* TROFÉU / DERROTA */
 /* ========================= */
 .trofeu {
   width: 170px;
@@ -83,38 +85,58 @@
 }
 
 /* ========================= */
-/* 🔘 BOTÃO EMBAIXO */
+/* AÇÕES FINAIS */
 /* ========================= */
-.btn-reiniciar {
-  width: 80%;
+.acoes-finais {
+  width: 90%;;
   max-width: 360px;
 
-  margin-bottom: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
 
-  padding: 18px 0;
-  font-size: 1.2rem;
+  margin-bottom: 20px;
+}
+
+/* ========================= */
+/* BOTÕES (PADRÃO MODAL) */
+/* ========================= */
+.final-btn {
+  width: 100%;
+  padding: 16px;
+
+  font-size: 1.1rem;
   font-weight: 900;
+  color: #fff;
 
   border: 4px solid #111;
   border-radius: 14px;
   cursor: pointer;
 
-  background: linear-gradient(135deg, #facc15, #eab308);
-  color: #000;
-
   box-shadow: 0 6px 0 #111;
-
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
 }
 
-.btn-reiniciar:hover {
-  transform: translateY(-2px) scale(1.05);
+.final-btn:hover {
+  transform: translateY(-2px);
   box-shadow: 0 8px 0 #111;
 }
 
-.btn-reiniciar:active {
+.final-btn:active {
   transform: translateY(2px);
   box-shadow: 0 3px 0 #111;
+}
+
+/* 🔵 REVANCHE */
+.final-btn-blue {
+  background: #3b82f6;
+}
+
+/* 🔴 VOLTAR AO MENU */
+.final-btn-red {
+  background: #ffffff;
+  color:#111;
 }
 
 /* ========================= */
@@ -148,9 +170,8 @@
 }
 
 /* ========================= */
-/* 🎉 CONFETES */
+/* CONFETES */
 /* ========================= */
-/* CONFETES POR CIMA DE TUDO */
 .confete {
   position: absolute;
   top: 0;
@@ -160,17 +181,16 @@
 
   animation: cair 3s linear forwards;
 
-  z-index: 5; /* ⬅️ MAIOR que o troféu */
-  pointer-events: none; /* não bloqueia clique */
+  z-index: 5;
+  pointer-events: none;
 }
 
-
 @keyframes cair {
-  0% {
+  from {
     transform: translateY(0) rotate(0deg);
     opacity: 1;
   }
-  100% {
+  to {
     transform: translateY(100vh) rotate(360deg);
     opacity: 0;
   }

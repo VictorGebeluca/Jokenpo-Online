@@ -8,6 +8,6 @@ export default defineConfig({
     port: 5173, // sua porta de desenvolvimento
     strictPort: true,
     // Permite acesso apenas do host ngrok especificado
-    allowedHosts: ['f15f16553359.ngrok-free.app'],
+    allowedHosts: ['e7e5647eb75d.ngrok-free.app'],
   },
 });

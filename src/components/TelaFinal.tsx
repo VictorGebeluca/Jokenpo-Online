@@ -9,9 +9,14 @@ interface Confete {
 interface Props {
   vencedor: "jogador" | "bot";
   onReiniciar: () => void;
+  onVoltarMenu: () => void;
 }
 
-export default function TelaFinal({ vencedor, onReiniciar }: Props) {
+export default function TelaFinal({
+  vencedor,
+  onReiniciar,
+  onVoltarMenu,
+}: Props) {
   const [confetes, setConfetes] = useState<Confete[]>([]);
 
   useEffect(() => {
@@ -56,13 +61,26 @@ export default function TelaFinal({ vencedor, onReiniciar }: Props) {
         />
 
         <h1 className="winner-text animar-texto">
-          {vencedor === "jogador" ? "Você venceu!!" : "Game over!!"}
+          {vencedor === "jogador" ? "Você venceu!!" : "Game Over!!"}
         </h1>
       </div>
 
-      <button className="btn-reiniciar" onClick={onReiniciar}>
-        Jogar novamente
-      </button>
+      {/* 🔘 AÇÕES FINAIS */}
+      <div className="acoes-finais">
+        <button
+          className="final-btn final-btn-blue"
+          onClick={onReiniciar}
+        >
+          Revanche
+        </button>
+
+        <button
+          className="final-btn final-btn-red"
+          onClick={onVoltarMenu}
+        >
+          Voltar ao menu
+        </button>
+      </div>
     </div>
   );
 }

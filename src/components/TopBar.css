@@ -15,22 +15,37 @@
 .topbar-btn {
   background: transparent;
   border: none;
-  padding: 5px;
-
-  font-size: 2.5rem;
   cursor: pointer;
 
+  padding: 4px; /* área de toque mobile */
   line-height: 1;
   user-select: none;
 
-  transition: transform 0.15s ease, opacity 0.15s ease;
+  /* REMOVE efeito de clique */
+  transform: none;
+  transition: opacity 0.15s ease;
 }
 
+/* hover opcional (não altera tamanho) */
 .topbar-btn:hover {
-  transform: scale(1.15);
-  opacity: 0.85;
+  opacity: 0.8;
 }
 
+/* REMOVE qualquer mudança ao clicar */
 .topbar-btn:active {
-  transform: scale(0.95);
+  transform: none;
 }
+
+/* TAMANHO DOS ÍCONES PNG */
+.topbar-icon {
+  width: 45px;
+  height: 45px;
+  display: block;
+}
+
+/* Mute ON (som ativo) um pouco maior */
+.topbar-icon--active {
+  width: 45x;
+  height: 45px;
+}
+
