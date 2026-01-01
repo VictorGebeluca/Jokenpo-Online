@@ -10,42 +10,45 @@ import Menu from "../components/Menu";
 import TopBar from "../components/TopBar";
 import Modal from "../components/Modal";
 
-import type { Escolha } from "../types/jogo";
+import { useJogo } from "../hooks/useJogo";
+
 import { useSound } from "../../public/sounds/useSound";
 
 import "./Jogo.css";
 
-type Vencedor = "jogador" | "bot";
+/* ========================= */
+/* TIPOS */
+/* ========================= */
 type Tela = "menu" | "jogo";
 
+/* ========================= */
+/* COMPONENTE */
+/* ========================= */
 export default function Jogo() {
+  /* ========================= */
+  /* TELAS / AUDIO */
+  /* ========================= */
   const [tela, setTela] = useState<Tela>("menu");
   const [audioLiberado, setAudioLiberado] = useState(false);
 
-  const [escolhaJogador, setEscolhaJogador] = useState<Escolha | null>(null);
-  const [escolhaBot, setEscolhaBot] = useState<Escolha | null>(null);
+  /* ========================= */
+  /* CONFIG */
+  /* ========================= */
+  const [config, setConfig] = useState({
+    musica: true,
+    efeitos: true,
+    rodadas: 3,
+    dificuldade: "normal" as "facil" | "normal" | "dificil",
+  });
 
-  const [mostrarJokenpo, setMostrarJokenpo] = useState(false);
-  const [mostrarResultado, setMostrarResultado] = useState(false);
-
-  const [pontosJogador, setPontosJogador] = useState(0);
-  const [pontosBot, setPontosBot] = useState(0);
-
-  const [pontosJogadorVisivel, setPontosJogadorVisivel] = useState(0);
-  const [pontosBotVisivel, setPontosBotVisivel] = useState(0);
-
-  const [finalizado, setFinalizado] = useState(false);
-  const [vencedor, setVencedor] = useState<Vencedor>("jogador");
-
+  /* ========================= */
+  /* UI */
+  /* ========================= */
   const [modalAberto, setModalAberto] = useState(false);
 
-  /* CONFIG */
-  const [musica, setMusica] = useState(true);
-  const [efeitos, setEfeitos] = useState(true);
-  const [rodadas, setRodadas] = useState(3);
-  const [dificuldade, setDificuldade] =
-    useState<"facil" | "normal" | "dificil">("normal");
-
+  /* ========================= */
+  /* SOM */
+  /* ========================= */
   const {
     playButton,
     playDrums,
@@ -60,20 +63,28 @@ export default function Jogo() {
     setEffectsEnabled,
   } = useSound();
 
-  /* 🔒 GARANTE SOM FINAL 1 VEZ */
+  /* ========================= */
+  /* JOGO (HOOK) */
+  /* ========================= */
+  const jogo = useJogo({
+    rodadas: config.rodadas,
+    onPlayButton: playButton,
+    onPlayDrums: playDrums,
+    onPlayWinner: playWinner,
+    onPlayLoser: playLoser,
+  });
+
+  /* ========================= */
+  /* SOM FINAL (1x) */
+  /* ========================= */
   const somFinalTocado = useRef(false);
 
   useEffect(() => {
-    if (!finalizado || somFinalTocado.current) return;
+    if (!jogo.finalizado || somFinalTocado.current) return;
 
     somFinalTocado.current = true;
-
-    if (vencedor === "jogador") {
-      playFinalWin();
-    } else {
-      playFinalLose();
-    }
-  }, [finalizado, vencedor, playFinalWin, playFinalLose]);
+    jogo.vencedor === "jogador" ? playFinalWin() : playFinalLose();
+  }, [jogo.finalizado, jogo.vencedor, playFinalWin, playFinalLose]);
 
   /* ========================= */
   /* MENU */
@@ -89,86 +100,10 @@ export default function Jogo() {
     setTimeout(() => setTela("jogo"), 200);
   }
 
-  /* ========================= */
-  /* JOGO */
-  /* ========================= */
-  function jogar(escolha: Escolha) {
-    if (finalizado || mostrarJokenpo || mostrarResultado) return;
-
-    playButton();
-
-    setTimeout(() => {
-      const opcoes: Escolha[] = ["pedra", "papel", "tesoura"];
-      const bot = opcoes[Math.floor(Math.random() * opcoes.length)];
-
-      setMostrarResultado(false);
-      setEscolhaJogador(null);
-      setEscolhaBot(null);
-
-      setMostrarJokenpo(true);
-      playDrums();
-
-      setTimeout(() => {
-        setMostrarJokenpo(false);
-        setEscolhaJogador(escolha);
-        setEscolhaBot(bot);
-
-        const jogadorVenceu =
-          (escolha === "pedra" && bot === "tesoura") ||
-          (escolha === "papel" && bot === "pedra") ||
-          (escolha === "tesoura" && bot === "papel");
-
-        const botVenceu =
-          (bot === "pedra" && escolha === "tesoura") ||
-          (bot === "papel" && escolha === "pedra") ||
-          (bot === "tesoura" && escolha === "papel");
-
-        let novoJogador = pontosJogador;
-        let novoBot = pontosBot;
-
-        if (jogadorVenceu) {
-          novoJogador++;
-          playWinner();
-        } else if (botVenceu) {
-          novoBot++;
-          playLoser();
-        }
-
-        setPontosJogador(novoJogador);
-        setPontosBot(novoBot);
-
-        setTimeout(() => {
-          setMostrarResultado(true);
-          setPontosJogadorVisivel(novoJogador);
-          setPontosBotVisivel(novoBot);
-
-          if (novoJogador === rodadas || novoBot === rodadas) {
-            setVencedor(novoJogador === rodadas ? "jogador" : "bot");
-            setTimeout(() => setFinalizado(true), 1200);
-            return;
-          }
-
-          setTimeout(() => {
-            setMostrarResultado(false);
-            setEscolhaJogador(null);
-            setEscolhaBot(null);
-          }, 2600);
-        }, 1200);
-      }, 2600);
-    }, 200);
-  }
-
-  function reiniciarJogo() {
+  function voltarMenu() {
+    jogo.reiniciar();
     somFinalTocado.current = false;
-    setFinalizado(false);
-    setPontosJogador(0);
-    setPontosBot(0);
-    setPontosJogadorVisivel(0);
-    setPontosBotVisivel(0);
-    setEscolhaJogador(null);
-    setEscolhaBot(null);
-    setMostrarResultado(false);
-    setMostrarJokenpo(false);
+    setTela("menu");
   }
 
   /* ========================= */
@@ -189,45 +124,50 @@ export default function Jogo() {
         <Modal
           aberto={modalAberto}
           tipo="menu"
-          musica={musica}
-          efeitos={efeitos}
-          rodadas={rodadas}
-          dificuldade={dificuldade}
-          onToggleMusica={() => {
-            setMusica((v) => {
-              const next = !v;
-              setMusicEnabled(next);
-              return next;
-            });
-          }}
-          onToggleEfeitos={() => {
-            setEfeitos((v) => {
-              const next = !v;
-              setEffectsEnabled(next);
-              return next;
-            });
-          }}
-          onChangeRodadas={setRodadas}
-          onChangeDificuldade={setDificuldade}
+          musica={config.musica}
+          efeitos={config.efeitos}
+          rodadas={config.rodadas}
+          dificuldade={config.dificuldade}
+          onToggleMusica={() =>
+            setConfig((c) => {
+              setMusicEnabled(!c.musica);
+              return { ...c, musica: !c.musica };
+            })
+          }
+          onToggleEfeitos={() =>
+            setConfig((c) => {
+              setEffectsEnabled(!c.efeitos);
+              return { ...c, efeitos: !c.efeitos };
+            })
+          }
+          onChangeRodadas={(rodadas) =>
+            setConfig((c) => ({ ...c, rodadas }))
+          }
+          onChangeDificuldade={(dificuldade) =>
+            setConfig((c) => ({ ...c, dificuldade }))
+          }
           onFechar={() => setModalAberto(false)}
         />
       </>
     );
   }
 
-  if (finalizado) {
+  if (jogo.finalizado) {
     return (
       <TelaFinal
-        vencedor={vencedor}
-        onReiniciar={reiniciarJogo}
-        onVoltarMenu={() => {
-          reiniciarJogo();
-          setTela("menu");
+        vencedor={jogo.vencedor}
+        onReiniciar={() => {
+          jogo.reiniciar();
+          somFinalTocado.current = false;
         }}
+        onVoltarMenu={voltarMenu}
       />
     );
   }
 
+  /* ========================= */
+  /* JOGO */
+  /* ========================= */
   return (
     <div className="jogo-container">
       <TopBar
@@ -237,51 +177,53 @@ export default function Jogo() {
       />
 
       <Placar
-        pontosJogador={pontosJogadorVisivel}
-        pontosBot={pontosBotVisivel}
-        total={rodadas}
+        pontosJogador={jogo.pontosJogadorVisivel}
+        pontosBot={jogo.pontosBotVisivel}
+        total={config.rodadas}
       />
 
-      {!mostrarJokenpo && (
+      {jogo.fase !== "jokenpo" && (
         <Arena
-          escolhaJogador={escolhaJogador}
-          escolhaOponente={escolhaBot}
+          escolhaJogador={jogo.escolhaJogador}
+          escolhaOponente={jogo.escolhaBot}
         />
       )}
 
-      {mostrarResultado && escolhaJogador && escolhaBot && (
-        <Resultado jogador={escolhaJogador} bot={escolhaBot} />
+      {jogo.fase === "resultado" &&
+        jogo.escolhaJogador &&
+        jogo.escolhaBot && (
+          <Resultado
+            jogador={jogo.escolhaJogador}
+            bot={jogo.escolhaBot}
+          />
+        )}
+
+      {jogo.fase === "idle" && !jogo.escolhaJogador && (
+        <BarraEscolhas onEscolher={jogo.jogar} />
       )}
 
-      {!mostrarJokenpo && !mostrarResultado && !escolhaJogador && (
-        <BarraEscolhas onEscolher={jogar} />
-      )}
-
-      <Jokenpo visivel={mostrarJokenpo} />
+      <Jokenpo visivel={jogo.fase === "jokenpo"} />
 
       <Modal
         aberto={modalAberto}
         tipo="jogo"
-        musica={musica}
-        efeitos={efeitos}
-        onToggleMusica={() => {
-          setMusica((v) => {
-            const next = !v;
-            setMusicEnabled(next);
-            return next;
-          });
-        }}
-        onToggleEfeitos={() => {
-          setEfeitos((v) => {
-            const next = !v;
-            setEffectsEnabled(next);
-            return next;
-          });
-        }}
+        musica={config.musica}
+        efeitos={config.efeitos}
+        onToggleMusica={() =>
+          setConfig((c) => {
+            setMusicEnabled(!c.musica);
+            return { ...c, musica: !c.musica };
+          })
+        }
+        onToggleEfeitos={() =>
+          setConfig((c) => {
+            setEffectsEnabled(!c.efeitos);
+            return { ...c, efeitos: !c.efeitos };
+          })
+        }
         onSair={() => {
-          reiniciarJogo();
+          voltarMenu();
           setModalAberto(false);
-          setTela("menu");
         }}
         onFechar={() => setModalAberto(false)}
       />
