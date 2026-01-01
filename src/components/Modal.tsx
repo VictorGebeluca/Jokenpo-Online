@@ -1,25 +1,33 @@
 import "./Modal.css";
+import type { Dificuldade } from "../game/regras";
 
+/* ========================= */
+/* BASE */
+/* ========================= */
 interface BaseProps {
   aberto: boolean;
   tipo: "menu" | "jogo";
   onFechar: () => void;
 }
 
-/* PROPS EXCLUSIVAS DO MENU */
+/* ========================= */
+/* MENU */
+/* ========================= */
 interface MenuProps extends BaseProps {
   tipo: "menu";
   musica: boolean;
   efeitos: boolean;
   rodadas: number;
-  dificuldade: string;
+  dificuldade: Dificuldade;
   onToggleMusica: () => void;
   onToggleEfeitos: () => void;
   onChangeRodadas: (v: number) => void;
-  onChangeDificuldade: (v: string) => void;
+  onChangeDificuldade: (v: Dificuldade) => void;
 }
 
-/* PROPS EXCLUSIVAS DO JOGO */
+/* ========================= */
+/* JOGO */
+/* ========================= */
 interface JogoProps extends BaseProps {
   tipo: "jogo";
   musica: boolean;
@@ -31,6 +39,9 @@ interface JogoProps extends BaseProps {
 
 type Props = MenuProps | JogoProps;
 
+/* ========================= */
+/* COMPONENTE */
+/* ========================= */
 export default function Modal(props: Props) {
   if (!props.aberto) return null;
 
@@ -65,7 +76,7 @@ export default function Modal(props: Props) {
           </label>
         </div>
 
-        {/* 🔢 APENAS NO MENU */}
+        {/* 🔢 APENAS MENU */}
         {props.tipo === "menu" && (
           <>
             <div className="modal-item">
@@ -87,18 +98,20 @@ export default function Modal(props: Props) {
               <select
                 value={props.dificuldade}
                 onChange={(e) =>
-                  props.onChangeDificuldade(e.target.value)
+                  props.onChangeDificuldade(
+                    e.target.value as Dificuldade
+                  )
                 }
               >
                 <option value="facil">Fácil</option>
-                <option value="medio">Médio</option>
+                <option value="normal">Normal</option>
                 <option value="dificil">Difícil</option>
               </select>
             </div>
           </>
         )}
 
-        {/* 🚪 APENAS NO JOGO */}
+        {/* 🚪 APENAS JOGO */}
         {props.tipo === "jogo" && (
           <button className="modal-exit" onClick={props.onSair}>
             Sair do jogo

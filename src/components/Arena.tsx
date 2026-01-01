@@ -1,5 +1,6 @@
 import "./Arena.css";
-import type { Escolha } from "../types/jogo";
+import type { Escolha } from "../game/regras";
+
 
 interface Props {
   escolhaJogador: Escolha | null;

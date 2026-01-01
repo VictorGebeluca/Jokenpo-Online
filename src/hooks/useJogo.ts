@@ -1,5 +1,6 @@
 import { useRef, useState } from "react";
-import type { Escolha } from "../types/jogo";
+import type { Escolha, Dificuldade } from "../game/regras";
+
 import {
   decidirRodada,
   decidirVencedorFinal,
@@ -7,18 +8,33 @@ import {
   type VencedorFinal,
 } from "../game/regras";
 
+import {
+  botFacil,
+  botNormal,
+  botDificil,
+  resetarBotDificil,
+} from "../game/bot";
+
+/* ========================= */
+/* TIPOS */
+/* ========================= */
 type Fase = "idle" | "jokenpo" | "resultado";
 
 interface UseJogoParams {
   rodadas: number;
+  dificuldade: Dificuldade;
   onPlayButton: () => void;
   onPlayDrums: () => void;
   onPlayWinner: () => void;
   onPlayLoser: () => void;
 }
 
+/* ========================= */
+/* HOOK */
+/* ========================= */
 export function useJogo({
   rodadas,
+  dificuldade,
   onPlayButton,
   onPlayDrums,
   onPlayWinner,
@@ -53,6 +69,15 @@ export function useJogo({
   }
 
   /* ========================= */
+  /* BOT */
+  /* ========================= */
+  function escolherBot(escolhaJogador: Escolha): Escolha {
+    if (dificuldade === "facil") return botFacil();
+    if (dificuldade === "normal") return botNormal();
+    return botDificil(escolhaJogador);
+  }
+
+  /* ========================= */
   /* JOGAR */
   /* ========================= */
   function jogar(escolha: Escolha) {
@@ -63,8 +88,7 @@ export function useJogo({
 
     timeouts.current.push(
       window.setTimeout(() => {
-        const opcoes: Escolha[] = ["pedra", "papel", "tesoura"];
-        const bot = opcoes[Math.floor(Math.random() * opcoes.length)];
+        const bot = escolherBot(escolha);
 
         onPlayDrums();
 
@@ -101,6 +125,7 @@ export function useJogo({
                   setVencedor(
                     decidirVencedorFinal(novoJogador, novoBot, rodadas)
                   );
+
                   timeouts.current.push(
                     window.setTimeout(() => setFinalizado(true), 1200)
                   );
@@ -124,9 +149,12 @@ export function useJogo({
 
   /* ========================= */
   /* RESET */
-  /* ========================= */
+/* ========================= */
   function reiniciar() {
     limparTimeouts();
+
+    resetarBotDificil(); // 🧠 limpa memória do bot difícil
+
     setFase("idle");
     setFinalizado(false);
     setEscolhaJogador(null);
@@ -139,7 +167,7 @@ export function useJogo({
 
   /* ========================= */
   /* API */
-  /* ========================= */
+/* ========================= */
   return {
     fase,
     escolhaJogador,

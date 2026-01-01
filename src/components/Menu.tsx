@@ -1,5 +1,5 @@
 import "./Menu.css";
-import TopBar from "./topBar";
+import TopBar from "./TopBar";
 
 interface Props {
   onJogarBot: () => void;

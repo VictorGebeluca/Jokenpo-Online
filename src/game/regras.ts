@@ -1,7 +1,14 @@
-import type { Escolha } from "../types/jogo";
-
+/* ========================= */
+/* TIPOS */
+/* ========================= */
+export type Escolha = "pedra" | "papel" | "tesoura";
+export type Dificuldade = "facil" | "normal" | "dificil";
 export type ResultadoRodada = "jogador" | "bot" | "empate";
 export type VencedorFinal = "jogador" | "bot";
+
+/* ========================= */
+/* REGRAS */
+/* ========================= */
 
 /**
  * Decide o resultado de uma rodada

@@ -66,13 +66,15 @@ export default function Jogo() {
   /* ========================= */
   /* JOGO (HOOK) */
   /* ========================= */
-  const jogo = useJogo({
-    rodadas: config.rodadas,
-    onPlayButton: playButton,
-    onPlayDrums: playDrums,
-    onPlayWinner: playWinner,
-    onPlayLoser: playLoser,
-  });
+const jogo = useJogo({
+  rodadas: config.rodadas,
+  dificuldade: config.dificuldade,
+  onPlayButton: playButton,
+  onPlayDrums: playDrums,
+  onPlayWinner: playWinner,
+  onPlayLoser: playLoser,
+});
+
 
   /* ========================= */
   /* SOM FINAL (1x) */
@@ -143,9 +145,10 @@ export default function Jogo() {
           onChangeRodadas={(rodadas) =>
             setConfig((c) => ({ ...c, rodadas }))
           }
-          onChangeDificuldade={(dificuldade) =>
-            setConfig((c) => ({ ...c, dificuldade }))
-          }
+          onChangeDificuldade={(dificuldade: "facil" | "normal" | "dificil") =>
+  setConfig((c) => ({ ...c, dificuldade }))
+}
+
           onFechar={() => setModalAberto(false)}
         />
       </>
