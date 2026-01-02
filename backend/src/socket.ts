@@ -26,10 +26,15 @@ export function registerSocket(io: Server) {
     });
 
     socket.on("JOIN_ROOM", (payload: JoinRoomPayload) => {
+      console.log("📥 JOIN_ROOM:", socket.id, payload.roomId);
+
       const room = roomManager.entrarSala(socket, payload.roomId);
 
       if (!room) {
-        socket.emit("ERROR", { message: "Sala inválida ou cheia" });
+        console.log("❌ Sala cheia ou inválida:", payload.roomId);
+        socket.emit("JOIN_ROOM_ERROR", {
+          message: "Sala inválida ou cheia"
+        });
         return;
       }
 
