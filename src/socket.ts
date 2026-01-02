@@ -1,8 +1,9 @@
 import { io } from "socket.io-client";
 
-export const socket = io("http://localhost:3001", {
+export const socket = io({
   transports: ["websocket"]
 });
+
 
 // 👇 expõe no console (APENAS PARA DEBUG)
 (window as any).socket = socket;

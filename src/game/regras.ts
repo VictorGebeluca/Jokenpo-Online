@@ -44,8 +44,7 @@ export function jogoFinalizado(
  */
 export function decidirVencedorFinal(
   pontosJogador: number,
-  pontosBot: number,
-  totalRodadas: number
+ totalRodadas: number
 ): VencedorFinal {
   return pontosJogador === totalRodadas ? "jogador" : "bot";
 }

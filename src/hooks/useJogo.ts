@@ -123,7 +123,7 @@ export function useJogo({
 
                 if (jogoFinalizado(novoJogador, novoBot, rodadas)) {
                   setVencedor(
-                    decidirVencedorFinal(novoJogador, novoBot, rodadas)
+                    decidirVencedorFinal(novoJogador, novoBot)
                   );
 
                   timeouts.current.push(
