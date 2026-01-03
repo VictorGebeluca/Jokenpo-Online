@@ -15,12 +15,12 @@ const io = new Server(server, {
 
 registerSocket(io);
 
-// 👉 aponta para o dist da RAIZ
-const frontendPath = path.join(__dirname, "../../dist");
+// 📌 caminho correto para o dist do frontend
+const frontendPath = path.resolve(__dirname, "../../dist");
 
 app.use(express.static(frontendPath));
 
-// fallback para SPA
+// fallback SPA (React)
 app.get("*", (_, res) => {
   res.sendFile(path.join(frontendPath, "index.html"));
 });
