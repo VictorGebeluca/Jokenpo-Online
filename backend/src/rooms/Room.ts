@@ -17,7 +17,7 @@ interface EstadoSala {
 }
 
 /* ========================= */
-/* REGRAS (BACKEND AUTORIDADE) */
+/* REGRAS */
 /* ========================= */
 function decidirRodada(a: Escolha, b: Escolha): "empate" | "a" | "b" {
   if (a === b) return "empate";
@@ -33,7 +33,7 @@ function decidirRodada(a: Escolha, b: Escolha): "empate" | "a" | "b" {
 
 /* ========================= */
 /* ROOM */
- /* ========================= */
+/* ========================= */
 export class Room {
   id: string;
   jogadores: Socket[] = [];
@@ -85,10 +85,21 @@ export class Room {
   }
 
   /* ========================= */
-  /* JOGO */
+  /* INICIAR JOGO */
+  /* ========================= */
+  iniciarSePronta() {
+    if (this.jogadores.length === 2 && this.fase === "idle") {
+      console.log("🔥 Jogo iniciado na sala", this.id);
+      this.fase = "jokenpo";
+      this.emitirEstado();
+    }
+  }
+
+  /* ========================= */
+  /* JOGADA */
   /* ========================= */
   escolher(socket: Socket, escolha: Escolha) {
-    if (this.fase !== "idle") return;
+    if (this.fase !== "jokenpo") return;
     if (!this.escolhas.has(socket.id)) return;
 
     this.escolhas.set(socket.id, escolha);
@@ -138,7 +149,7 @@ export class Room {
 
   private resetarRodada() {
     this.escolhas.forEach((_, key) => this.escolhas.set(key, null));
-    this.fase = "idle";
+    this.fase = "jokenpo";
     this.emitirEstado();
   }
 
@@ -158,7 +169,7 @@ export class Room {
   }
 
   /* ========================= */
-  /* RESET DA PARTIDA */
+  /* RESET */
   /* ========================= */
   reset() {
     this.fase = "idle";

@@ -28,24 +28,17 @@ export function registerSocket(io: Server) {
         roomId: room.id,
       });
 
-      // estado inicial (aguardando outro jogador)
-      io.to(room.id).emit("room:state", {
-        fase: "idle",
-        escolhas: {},
-        pontos: {},
-        jogadores: room.quantidadeJogadores,
-      });
-
       console.log("🏠 Sala criada:", room.id);
     });
 
     /* ========================= */
-    /* ENTRAR NA SALA (LEGADO) */
+    /* ENTRAR NA SALA */
     /* ========================= */
     socket.on("JOIN_ROOM", (payload: JoinRoomPayload) => {
       console.log("📥 JOIN_ROOM:", socket.id, payload.roomId);
 
       const room = roomManager.entrarSala(socket, payload.roomId);
+
       if (!room) {
         socket.emit("JOIN_ROOM_ERROR", {
           message: "Sala inválida ou cheia",
@@ -55,44 +48,25 @@ export function registerSocket(io: Server) {
 
       socket.join(room.id);
 
-      io.to(room.id).emit("room:state", {
-        fase: "idle",
-        escolhas: {},
-        pontos: {},
+      // confirma para quem entrou
+      socket.emit("JOIN_ROOM_SUCCESS", {
+        roomId: room.id,
+      });
+
+      // avisa todos da sala
+      io.to(room.id).emit("PLAYER_JOINED", {
         jogadores: room.quantidadeJogadores,
       });
 
       console.log("➕ Jogador entrou na sala:", room.id);
+
+      // 🔥 AQUI COMEÇA A PUTARIA
+      // se a sala estiver pronta (2 jogadores), o jogo começa
+      room.iniciarSePronta();
     });
 
     /* ========================= */
-    /* ENTRAR NA SALA (ONLINE) */
-    /* ========================= */
-    socket.on(
-      "room:join",
-      ({
-        roomId,
-      }: {
-        roomId: string;
-      }) => {
-        const room = roomManager.entrarSala(socket, roomId);
-        if (!room) return;
-
-        socket.join(room.id);
-
-        io.to(room.id).emit("room:state", {
-          fase: "idle",
-          escolhas: {},
-          pontos: {},
-          jogadores: room.quantidadeJogadores,
-        });
-
-        console.log("👥 room:join:", socket.id, room.id);
-      }
-    );
-
-    /* ========================= */
-    /* ESCOLHER JOGADA */
+    /* ESCOLHA DE JOGADA */
     /* ========================= */
     socket.on(
       "room:choice",
@@ -105,20 +79,12 @@ export function registerSocket(io: Server) {
     );
 
     /* ========================= */
-    /* REINICIAR PARTIDA */
+    /* REINICIAR */
     /* ========================= */
     socket.on("room:restart", ({ roomId }: { roomId: string }) => {
       const room = roomManager.get(roomId);
       if (!room) return;
-
-      room.reset?.();
-
-      io.to(room.id).emit("room:state", {
-        fase: "idle",
-        escolhas: {},
-        pontos: {},
-        jogadores: room.quantidadeJogadores,
-      });
+      // replay pode ser implementado depois
     });
 
     /* ========================= */
@@ -131,13 +97,6 @@ export function registerSocket(io: Server) {
       if (!room) return;
 
       socket.leave(room.id);
-
-      io.to(room.id).emit("room:state", {
-        fase: "idle",
-        escolhas: {},
-        pontos: {},
-        jogadores: room.quantidadeJogadores,
-      });
 
       room.jogadores.forEach(j =>
         j.emit("PLAYER_LEFT", { socketId: socket.id })
