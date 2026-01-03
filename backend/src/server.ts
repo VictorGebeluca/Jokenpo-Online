@@ -24,5 +24,6 @@ app.use(express.static(frontendPath));
 app.get("*", (_, res) => {
   res.sendFile(path.join(frontendPath, "index.html"));
 });
+console.log("🔥 BACKEND ATUALIZADO", new Date().toISOString());
 
 export { server };

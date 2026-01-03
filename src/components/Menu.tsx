@@ -3,15 +3,17 @@ import TopBar from "./TopBar";
 
 interface Props {
   onJogarBot: () => void;
+  onJogarOnline: () => void; // ✅ NOVO
   onAtivarAudio: () => void;
   audioLiberado: boolean;
   isMuted: boolean;
   onToggleMute: () => void;
-  onOpenSettings: () => void; // ✅ NOVO
+  onOpenSettings: () => void;
 }
 
 export default function Menu({
   onJogarBot,
+  onJogarOnline,
   onAtivarAudio,
   audioLiberado,
   isMuted,
@@ -23,7 +25,7 @@ export default function Menu({
       <TopBar
         isMuted={isMuted}
         onToggleMute={onToggleMute}
-        onOpenSettings={onOpenSettings} // ✅ agora funciona
+        onOpenSettings={onOpenSettings}
       />
 
       {!audioLiberado && (
@@ -46,8 +48,12 @@ export default function Menu({
           🤖 Jogar com Bot
         </button>
 
-        <button className="menu-btn disabled" disabled>
-          👥 Jogar com Amigo
+        <button
+          className="menu-btn"
+          onClick={onJogarOnline}
+          disabled={!audioLiberado}
+        >
+          👥 Jogar com amigo
         </button>
 
         <button className="menu-btn disabled" disabled>

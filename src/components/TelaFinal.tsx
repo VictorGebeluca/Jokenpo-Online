@@ -7,10 +7,11 @@ interface Confete {
 }
 
 interface Props {
-  vencedor: "jogador" | "bot";
+  vencedor?: "bot" | "jogador";
   onReiniciar: () => void;
   onVoltarMenu: () => void;
 }
+
 
 export default function TelaFinal({
   vencedor,
