@@ -38,6 +38,9 @@ export class RoomManager {
     this.socketToRoom.set(socket.id, roomId);
     socket.join(roomId);
 
+    // 🔥 SINCRONIZA TODOS (inclusive jogador 2)
+    room.emitirEstado();
+
     return room;
   }
 
@@ -61,10 +64,11 @@ export class RoomManager {
     room.removerJogador(socket);
     this.socketToRoom.delete(socket.id);
 
-    // se não sobrar ninguém, remove a sala
     if (room.quantidadeJogadores === 0) {
       this.rooms.delete(roomId);
-      console.log("🗑️ Sala removida:", roomId);
+    } else {
+      // 🔥 atualiza quem ficou
+      room.emitirEstado();
     }
 
     return room;

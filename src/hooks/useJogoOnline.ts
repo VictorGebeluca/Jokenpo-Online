@@ -1,68 +1,66 @@
 import { useEffect, useState } from "react";
 import { socket } from "../socket";
-import type { Escolha, Dificuldade } from "../game/regras";
+import type { Escolha } from "../game/regras";
 
 /* ========================= */
 /* TIPOS */
 /* ========================= */
-export type Fase = "idle" | "jokenpo" | "resultado" | "finalizado";
+export type Fase =
+  | "aguardando_jogadores"
+  | "aguardando_jogadas"
+  | "jokenpo"
+  | "resultado"
+  | "finalizado";
 
 export interface EstadoSala {
   fase: Fase;
   escolhas: Record<string, Escolha | null>;
   pontos: Record<string, number>;
+  jogadores: number;
   vencedorRodada?: string;
   vencedorFinal?: string;
-}
-
-interface UseJogoOnlineParams {
-  roomId: string;
-  rodadas: number;
-  dificuldade: Dificuldade;
 }
 
 /* ========================= */
 /* HOOK */
 /* ========================= */
-export function useJogoOnline({
-  roomId,
-  rodadas,
-  dificuldade,
-}: UseJogoOnlineParams) {
+export function useJogoOnline(roomId: string | null) {
   const [estado, setEstado] = useState<EstadoSala | null>(null);
-  const [fase, setFase] = useState<Fase>("idle");
 
   /* ========================= */
-  /* SOCKET LIFECYCLE */
+  /* RESET AO TROCAR / SAIR DA SALA */
+  /* ========================= */
+  useEffect(() => {
+    setEstado(null);
+  }, [roomId]);
+
+  /* ========================= */
+  /* LISTENER + SYNC INICIAL */
   /* ========================= */
   useEffect(() => {
     if (!roomId) return;
 
-    // entra na sala
-    socket.emit("room:join", {
-      roomId,
-      rodadas,
-      dificuldade,
-    });
-
-    // recebe estado da sala
-    function onState(novoEstado: EstadoSala) {
+    const onState = (novoEstado: EstadoSala) => {
       setEstado(novoEstado);
-      setFase(novoEstado.fase);
-    }
+    };
 
     socket.on("room:state", onState);
+
+    // 🔥 PEDE O ESTADO ATUAL (ESSENCIAL PARA REFRESH / RECONNECT)
+    socket.emit("room:get_state", { roomId });
 
     return () => {
       socket.off("room:state", onState);
     };
-  }, [roomId, rodadas, dificuldade]);
+  }, [roomId]);
 
   /* ========================= */
   /* AÇÕES */
   /* ========================= */
   function escolher(escolha: Escolha) {
-    if (fase !== "idle") return;
+    if (!roomId) return;
+    if (!estado) return;
+    if (estado.fase !== "aguardando_jogadas") return;
 
     socket.emit("room:choice", {
       roomId,
@@ -71,17 +69,17 @@ export function useJogoOnline({
   }
 
   function reiniciar() {
+    if (!roomId) return;
+
     socket.emit("room:restart", { roomId });
-    setEstado(null);
-    setFase("idle");
   }
 
   /* ========================= */
   /* API */
   /* ========================= */
   return {
-    fase,
     estado,
+    fase: estado?.fase,
     escolher,
     reiniciar,
   };

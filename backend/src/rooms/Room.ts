@@ -5,7 +5,12 @@ import { Dificuldade } from "../contracts/events";
 /* TIPOS */
 /* ========================= */
 export type Escolha = "pedra" | "papel" | "tesoura";
-export type Fase = "idle" | "jokenpo" | "resultado" | "finalizado";
+export type Fase =
+  | "aguardando_jogadores"
+  | "aguardando_jogadas"
+  | "jokenpo"
+  | "resultado"
+  | "finalizado";
 
 interface EstadoSala {
   fase: Fase;
@@ -40,7 +45,7 @@ export class Room {
   rodadas: number;
   dificuldade: Dificuldade;
 
-  private fase: Fase = "idle";
+  private fase: Fase = "aguardando_jogadores";
   private escolhas = new Map<string, Escolha | null>();
   private pontos = new Map<string, number>();
   private rodadaAtual = 0;
@@ -68,7 +73,18 @@ export class Room {
     this.escolhas.set(socket.id, null);
     this.pontos.set(socket.id, 0);
 
+    // 1️⃣ Sempre emite o estado atual ao entrar
     this.emitirEstado();
+
+    // 2️⃣ Só depois que os DOIS já receberam o estado,
+    // muda para aguardando_jogadas
+    if (this.jogadores.length === 2) {
+      setTimeout(() => {
+        this.fase = "aguardando_jogadas";
+        this.emitirEstado();
+      }, 0);
+    }
+
     return true;
   }
 
@@ -76,6 +92,10 @@ export class Room {
     this.jogadores = this.jogadores.filter(j => j.id !== socket.id);
     this.escolhas.delete(socket.id);
     this.pontos.delete(socket.id);
+
+    if (this.jogadores.length < 2) {
+      this.fase = "aguardando_jogadores";
+    }
 
     this.emitirEstado();
   }
@@ -85,21 +105,10 @@ export class Room {
   }
 
   /* ========================= */
-  /* INICIAR JOGO */
-  /* ========================= */
-  iniciarSePronta() {
-    if (this.jogadores.length === 2 && this.fase === "idle") {
-      console.log("🔥 Jogo iniciado na sala", this.id);
-      this.fase = "jokenpo";
-      this.emitirEstado();
-    }
-  }
-
-  /* ========================= */
   /* JOGADA */
   /* ========================= */
   escolher(socket: Socket, escolha: Escolha) {
-    if (this.fase !== "jokenpo") return;
+    if (this.fase !== "aguardando_jogadas") return;
     if (!this.escolhas.has(socket.id)) return;
 
     this.escolhas.set(socket.id, escolha);
@@ -109,7 +118,12 @@ export class Room {
     );
 
     if (todasEscolhas) {
-      this.resolverRodada();
+      this.fase = "jokenpo";
+      this.emitirEstado();
+
+      setTimeout(() => this.resolverRodada(), 2000);
+    } else {
+      this.emitirEstado();
     }
   }
 
@@ -138,18 +152,18 @@ export class Room {
 
     this.rodadaAtual++;
 
-    if (this.rodadaAtual >= this.rodadas) {
-      this.finalizarJogo();
-    } else {
-      setTimeout(() => this.resetarRodada(), 2000);
-    }
-
     this.emitirEstado(vencedorRodada);
+
+    if (this.rodadaAtual >= this.rodadas) {
+      setTimeout(() => this.finalizarJogo(), 2000);
+    } else {
+      setTimeout(() => this.resetarRodada(), 2500);
+    }
   }
 
   private resetarRodada() {
     this.escolhas.forEach((_, key) => this.escolhas.set(key, null));
-    this.fase = "jokenpo";
+    this.fase = "aguardando_jogadas";
     this.emitirEstado();
   }
 
@@ -172,7 +186,6 @@ export class Room {
   /* RESET */
   /* ========================= */
   reset() {
-    this.fase = "idle";
     this.rodadaAtual = 0;
 
     this.escolhas.clear();
@@ -183,13 +196,18 @@ export class Room {
       this.pontos.set(j.id, 0);
     });
 
+    this.fase =
+      this.jogadores.length === 2
+        ? "aguardando_jogadas"
+        : "aguardando_jogadores";
+
     this.emitirEstado();
   }
 
   /* ========================= */
   /* EMISSÃO */
   /* ========================= */
-  private emitirEstado(
+  emitirEstado(
     vencedorRodada?: string,
     vencedorFinal?: string
   ) {

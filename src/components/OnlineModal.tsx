@@ -20,6 +20,9 @@ export default function OnlineModal({
   const [codigoInput, setCodigoInput] = useState("");
   const [carregando, setCarregando] = useState(false);
 
+  /* ========================= */
+  /* RESET */
+  /* ========================= */
   useEffect(() => {
     if (!aberto) {
       setEtapa("menu");
@@ -46,11 +49,15 @@ export default function OnlineModal({
       setCodigoSala(roomId);
       setEtapa("criar");
       setCarregando(false);
+
+      // 🔥 JOGADOR 1 JÁ ENTRA NO MODO ONLINE
+      onSalaPronta(roomId);
+      onFechar();
     });
   }
 
   /* ========================= */
-  /* ENTRAR NA SALA */
+  /* ENTRAR SALA */
   /* ========================= */
   function entrarSala() {
     if (!codigoInput) return;
@@ -63,7 +70,10 @@ export default function OnlineModal({
 
     socket.once("JOIN_ROOM_SUCCESS", ({ roomId }) => {
       setCarregando(false);
+
+      // 🔥 JOGADOR 2 ENTRA DIRETO
       onSalaPronta(roomId);
+      onFechar();
     });
 
     socket.once("JOIN_ROOM_ERROR", ({ message }) => {
@@ -72,18 +82,23 @@ export default function OnlineModal({
     });
   }
 
+  /* ========================= */
+  /* UI */
+  /* ========================= */
   return (
     <div className="modal-backdrop">
       <div className="modal online">
-        <button className="fechar" onClick={onFechar}>
-          ✖
-        </button>
+        <button className="fechar" onClick={onFechar}>✖</button>
 
         {etapa === "menu" && (
           <>
             <h2>Jogar Online</h2>
 
-            <button className="online-btn" onClick={criarSala}>
+            <button
+              className="online-btn"
+              onClick={criarSala}
+              disabled={carregando}
+            >
               Criar sala
             </button>
 
@@ -93,33 +108,6 @@ export default function OnlineModal({
             >
               Entrar em sala
             </button>
-          </>
-        )}
-
-        {etapa === "criar" && (
-          <>
-            <h2>Sala criada</h2>
-
-            {carregando && <p>⏳ Criando sala...</p>}
-
-            {!carregando && codigoSala && (
-              <>
-                <div className="codigo-sala">
-                  <span>{codigoSala}</span>
-                  <button
-                    onClick={() =>
-                      navigator.clipboard.writeText(codigoSala)
-                    }
-                  >
-                    📋
-                  </button>
-                </div>
-
-                <p className="aguardando">
-                  Aguardando outro jogador…
-                </p>
-              </>
-            )}
           </>
         )}
 
@@ -142,8 +130,6 @@ export default function OnlineModal({
             >
               Entrar
             </button>
-
-            {carregando && <p>⏳ Entrando na sala...</p>}
           </>
         )}
       </div>

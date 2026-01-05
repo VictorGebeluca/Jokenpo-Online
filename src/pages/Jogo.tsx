@@ -2,7 +2,6 @@ import { useEffect, useRef, useState } from "react";
 
 import Arena from "../components/Arena";
 import Placar from "../components/Placar";
-import Resultado from "../components/Resultado";
 import BarraEscolhas from "../components/BarraEscolhas";
 import Jokenpo from "../components/Jokenpo";
 import TelaFinal from "../components/TelaFinal";
@@ -15,36 +14,22 @@ import { useJogo } from "../hooks/useJogo";
 import { useJogoOnline } from "../hooks/useJogoOnline";
 
 import { useSound } from "../../public/sounds/useSound";
+import { socket } from "../socket";
 
 import "./Jogo.css";
 
-/* ========================= */
-/* TIPOS */
-/* ========================= */
 type Tela = "menu" | "jogo";
 type ModoJogo = "bot" | "online";
 
-/* ========================= */
-/* COMPONENTE */
-/* ========================= */
 export default function Jogo() {
-  /* ========================= */
-  /* TELAS / MODO */
-  /* ========================= */
   const [tela, setTela] = useState<Tela>("menu");
   const [modo, setModo] = useState<ModoJogo>("bot");
   const [roomId, setRoomId] = useState<string | null>(null);
 
-  /* ========================= */
-  /* AUDIO / UI */
-  /* ========================= */
   const [audioLiberado, setAudioLiberado] = useState(false);
   const [modalAberto, setModalAberto] = useState(false);
   const [modalOnlineAberto, setModalOnlineAberto] = useState(false);
 
-  /* ========================= */
-  /* CONFIG */
-  /* ========================= */
   const [config, setConfig] = useState({
     musica: true,
     efeitos: true,
@@ -52,14 +37,8 @@ export default function Jogo() {
     dificuldade: "normal" as "facil" | "normal" | "dificil",
   });
 
-  /* ========================= */
-  /* SOM */
-  /* ========================= */
   const {
     playButton,
-    playDrums,
-    playWinner,
-    playLoser,
     playFinalWin,
     playFinalLose,
     toggleMute,
@@ -70,25 +49,37 @@ export default function Jogo() {
   } = useSound();
 
   /* ========================= */
-  /* JOGOS */
+  /* BOT */
   /* ========================= */
   const jogoBot = useJogo({
     rodadas: config.rodadas,
     dificuldade: config.dificuldade,
     onPlayButton: playButton,
-    onPlayDrums: playDrums,
-    onPlayWinner: playWinner,
-    onPlayLoser: playLoser,
+    onPlayDrums: () => {},
+    onPlayWinner: () => {},
+    onPlayLoser: () => {},
   });
 
-  const jogoOnline =
-    modo === "online" && roomId
-      ? useJogoOnline({
-          roomId,
-          rodadas: config.rodadas,
-          dificuldade: config.dificuldade,
-        })
-      : null;
+  /* ========================= */
+  /* ONLINE */
+  /* ========================= */
+  const jogoOnline = useJogoOnline(
+    modo === "online" ? roomId : null
+  );
+
+  /* ========================= */
+  /* TROCA DE TELA ONLINE */
+  /* ========================= */
+  useEffect(() => {
+    if (modo === "online") {
+      setTela("jogo");
+    }
+  }, [modo]);
+
+  /* ========================= */
+  /* SOCKET ID */
+  /* ========================= */
+  const meuId = socket.id;
 
   /* ========================= */
   /* ADAPTER UI */
@@ -107,31 +98,48 @@ export default function Jogo() {
           reiniciar: jogoBot.reiniciar,
         }
       : (() => {
-          const estado = jogoOnline?.estado;
+          const estado = jogoOnline.estado;
 
-          const jogadores = estado ? Object.keys(estado.pontos) : [];
-          const jogadorLocalId = jogadores[0];
-          const oponenteId = jogadores[1];
+          if (!estado || !meuId) {
+            return {
+              fase: "aguardando_jogadores",
+              escolhaJogador: null,
+              escolhaOponente: null,
+              pontosJogador: 0,
+              pontosOponente: 0,
+              finalizado: false,
+              vencedor: undefined,
+              jogar: () => {},
+              reiniciar: () => {},
+            };
+          }
 
-          let vencedor: "jogador" | "bot" | undefined = undefined;
+          const ids = Object.keys(estado.pontos);
+          const oponenteId = ids.find(id => id !== meuId);
 
-          if (estado?.vencedorFinal && jogadorLocalId) {
+          let vencedor: "jogador" | "bot" | undefined;
+
+          if (estado.vencedorFinal) {
             vencedor =
-              estado.vencedorFinal === jogadorLocalId
+              estado.vencedorFinal === meuId
                 ? "jogador"
                 : "bot";
           }
 
           return {
-            fase: jogoOnline?.fase ?? "idle",
-            escolhaJogador: null,
-            escolhaOponente: null,
-            pontosJogador: estado?.pontos[jogadorLocalId] ?? 0,
-            pontosOponente: estado?.pontos[oponenteId] ?? 0,
-            finalizado: jogoOnline?.fase === "finalizado",
+            fase: estado.fase,
+            escolhaJogador: estado.escolhas[meuId] ?? null,
+            escolhaOponente: oponenteId
+              ? estado.escolhas[oponenteId] ?? null
+              : null,
+            pontosJogador: estado.pontos[meuId] ?? 0,
+            pontosOponente: oponenteId
+              ? estado.pontos[oponenteId] ?? 0
+              : 0,
+            finalizado: estado.fase === "finalizado",
             vencedor,
-            jogar: jogoOnline ? jogoOnline.escolher : () => {},
-            reiniciar: jogoOnline ? jogoOnline.reiniciar : () => {},
+            jogar: jogoOnline.escolher,
+            reiniciar: jogoOnline.reiniciar,
           };
         })();
 
@@ -141,14 +149,14 @@ export default function Jogo() {
   const somFinalTocado = useRef(false);
 
   useEffect(() => {
-    if (!jogoUI.finalizado || somFinalTocado.current || !jogoUI.vencedor)
-      return;
+    if (!jogoUI.finalizado || somFinalTocado.current) return;
+    if (!jogoUI.vencedor) return;
 
     somFinalTocado.current = true;
 
     if (jogoUI.vencedor === "jogador") playFinalWin();
     if (jogoUI.vencedor === "bot") playFinalLose();
-  }, [jogoUI.finalizado, jogoUI.vencedor, playFinalWin, playFinalLose]);
+  }, [jogoUI.finalizado, jogoUI.vencedor]);
 
   /* ========================= */
   /* MENU */
@@ -161,8 +169,7 @@ export default function Jogo() {
   function iniciarBot() {
     if (!audioLiberado) return;
     setModo("bot");
-    playButton();
-    setTimeout(() => setTela("jogo"), 200);
+    setTela("jogo");
   }
 
   function iniciarOnline() {
@@ -195,41 +202,12 @@ export default function Jogo() {
           onOpenSettings={() => setModalAberto(true)}
         />
 
-        <Modal
-          aberto={modalAberto}
-          tipo="menu"
-          musica={config.musica}
-          efeitos={config.efeitos}
-          rodadas={config.rodadas}
-          dificuldade={config.dificuldade}
-          onToggleMusica={() =>
-            setConfig(c => {
-              setMusicEnabled(!c.musica);
-              return { ...c, musica: !c.musica };
-            })
-          }
-          onToggleEfeitos={() =>
-            setConfig(c => {
-              setEffectsEnabled(!c.efeitos);
-              return { ...c, efeitos: !c.efeitos };
-            })
-          }
-          onChangeRodadas={rodadas =>
-            setConfig(c => ({ ...c, rodadas }))
-          }
-          onChangeDificuldade={dificuldade =>
-            setConfig(c => ({ ...c, dificuldade }))
-          }
-          onFechar={() => setModalAberto(false)}
-        />
-
         <OnlineModal
           aberto={modalOnlineAberto}
           onFechar={() => setModalOnlineAberto(false)}
           onSalaPronta={id => {
             setModo("online");
             setRoomId(id);
-            setTela("jogo");
             setModalOnlineAberto(false);
           }}
         />
@@ -267,25 +245,15 @@ export default function Jogo() {
         total={config.rodadas}
       />
 
-      {jogoUI.fase !== "jokenpo" && (
-        <Arena
-          escolhaJogador={jogoUI.escolhaJogador}
-          escolhaOponente={jogoUI.escolhaOponente}
-        />
-      )}
+      <Arena
+        escolhaJogador={jogoUI.escolhaJogador}
+        escolhaOponente={jogoUI.escolhaOponente}
+      />
 
-      {jogoUI.fase === "resultado" &&
-        jogoUI.escolhaJogador &&
-        jogoUI.escolhaOponente && (
-          <Resultado
-            jogador={jogoUI.escolhaJogador}
-            bot={jogoUI.escolhaOponente}
-          />
+      {jogoUI.fase === "aguardando_jogadas" &&
+        jogoUI.escolhaJogador === null && (
+          <BarraEscolhas onEscolher={jogoUI.jogar} />
         )}
-
-      {jogoUI.fase === "idle" && (
-        <BarraEscolhas onEscolher={jogoUI.jogar} />
-      )}
 
       <Jokenpo visivel={jogoUI.fase === "jokenpo"} />
 
@@ -306,10 +274,7 @@ export default function Jogo() {
             return { ...c, efeitos: !c.efeitos };
           })
         }
-        onSair={() => {
-          voltarMenu();
-          setModalAberto(false);
-        }}
+        onSair={voltarMenu}
         onFechar={() => setModalAberto(false)}
       />
     </div>

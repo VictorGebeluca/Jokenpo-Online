@@ -48,22 +48,23 @@ export function registerSocket(io: Server) {
 
       socket.join(room.id);
 
-      // confirma para quem entrou
       socket.emit("JOIN_ROOM_SUCCESS", {
         roomId: room.id,
       });
 
-      // avisa todos da sala
-      io.to(room.id).emit("PLAYER_JOINED", {
-        jogadores: room.quantidadeJogadores,
-      });
-
       console.log("➕ Jogador entrou na sala:", room.id);
-
-      // 🔥 AQUI COMEÇA A PUTARIA
-      // se a sala estiver pronta (2 jogadores), o jogo começa
-      room.iniciarSePronta();
     });
+
+    /* ========================= */
+    /* 🔥 PEDIR ESTADO ATUAL (REFRESH SAFE) */
+    /* ========================= */
+    socket.on("room:get_state", ({ roomId }) => {
+  const room = roomManager.get(roomId);
+  if (!room) return;
+
+  room.emitirEstado();
+});
+
 
     /* ========================= */
     /* ESCOLHA DE JOGADA */
@@ -84,7 +85,8 @@ export function registerSocket(io: Server) {
     socket.on("room:restart", ({ roomId }: { roomId: string }) => {
       const room = roomManager.get(roomId);
       if (!room) return;
-      // replay pode ser implementado depois
+
+      room.reset();
     });
 
     /* ========================= */
