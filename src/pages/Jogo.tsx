@@ -5,6 +5,7 @@ import Placar from "../components/Placar";
 import BarraEscolhas from "../components/BarraEscolhas";
 import Jokenpo from "../components/Jokenpo";
 import TelaFinal from "../components/TelaFinal";
+import Resultado from "../components/Resultado";
 import Menu from "../components/Menu";
 import TopBar from "../components/TopBar";
 import Modal from "../components/Modal";
@@ -68,7 +69,7 @@ export default function Jogo() {
   );
 
   /* ========================= */
-  /* 🔥 TROCA DE TELA ONLINE (CORRIGIDA) */
+  /* TROCA DE TELA ONLINE */
   /* ========================= */
   useEffect(() => {
     if (modo !== "online") return;
@@ -82,15 +83,9 @@ export default function Jogo() {
     }
 
     socket.on("room:state", onState);
-
-    return () => {
-      socket.off("room:state", onState);
-    };
+    return () => socket.off("room:state", onState);
   }, [modo, roomId]);
 
-  /* ========================= */
-  /* SOCKET ID */
-  /* ========================= */
   const meuId = socket.id;
 
   /* ========================= */
@@ -130,12 +125,9 @@ export default function Jogo() {
           const oponenteId = ids.find(id => id !== meuId);
 
           let vencedor: "jogador" | "bot" | undefined;
-
           if (estado.vencedorFinal) {
             vencedor =
-              estado.vencedorFinal === meuId
-                ? "jogador"
-                : "bot";
+              estado.vencedorFinal === meuId ? "jogador" : "bot";
           }
 
           return {
@@ -166,8 +158,9 @@ export default function Jogo() {
 
     somFinalTocado.current = true;
 
-    if (jogoUI.vencedor === "jogador") playFinalWin();
-    if (jogoUI.vencedor === "bot") playFinalLose();
+    jogoUI.vencedor === "jogador"
+      ? playFinalWin()
+      : playFinalLose();
   }, [jogoUI.finalizado, jogoUI.vencedor]);
 
   /* ========================= */
@@ -199,95 +192,144 @@ export default function Jogo() {
   }
 
   /* ========================= */
-  /* TELAS */
-  /* ========================= */
-  if (tela === "menu") {
-    return (
-      <>
-        <Menu
-          onJogarBot={iniciarBot}
-          onJogarOnline={iniciarOnline}
-          onAtivarAudio={ativarAudio}
-          audioLiberado={audioLiberado}
-          isMuted={isMuted}
-          onToggleMute={toggleMute}
-          onOpenSettings={() => setModalAberto(true)}
-        />
-
-        <OnlineModal
-          aberto={modalOnlineAberto}
-          onFechar={() => setModalOnlineAberto(false)}
-          onSalaPronta={id => {
-            setModo("online");
-            setRoomId(id);
-          }}
-        />
-      </>
-    );
-  }
-
-  if (jogoUI.finalizado && jogoUI.vencedor) {
-    return (
-      <TelaFinal
-        vencedor={jogoUI.vencedor}
-        onReiniciar={() => {
-          jogoUI.reiniciar();
-          somFinalTocado.current = false;
-        }}
-        onVoltarMenu={voltarMenu}
-      />
-    );
-  }
-
-  /* ========================= */
-  /* JOGO */
+  /* RENDER */
   /* ========================= */
   return (
-    <div className="jogo-container">
-      <TopBar
-        isMuted={isMuted}
-        onToggleMute={toggleMute}
-        onOpenSettings={() => setModalAberto(true)}
-      />
+    <>
+      {tela === "menu" && (
+        <>
+          <Menu
+            onJogarBot={iniciarBot}
+            onJogarOnline={iniciarOnline}
+            onAtivarAudio={ativarAudio}
+            audioLiberado={audioLiberado}
+            isMuted={isMuted}
+            onToggleMute={toggleMute}
+            onOpenSettings={() => setModalAberto(true)}
+          />
 
-      <Placar
-        pontosJogador={jogoUI.pontosJogador}
-        pontosBot={jogoUI.pontosOponente}
-        total={config.rodadas}
-      />
+          <OnlineModal
+            aberto={modalOnlineAberto}
+            onFechar={() => setModalOnlineAberto(false)}
+            onSalaPronta={id => {
+              setModo("online");
+              setRoomId(id);
+            }}
+          />
+        </>
+      )}
 
-      <Arena
-        escolhaJogador={jogoUI.escolhaJogador}
-        escolhaOponente={jogoUI.escolhaOponente}
-      />
+      {tela === "jogo" && (
+        <>
+          {jogoUI.finalizado && jogoUI.vencedor ? (
+            <TelaFinal
+              vencedor={jogoUI.vencedor}
+              onReiniciar={() => {
+                jogoUI.reiniciar();
+                somFinalTocado.current = false;
+              }}
+              onVoltarMenu={voltarMenu}
+            />
+          ) : (
+            <div className="jogo-container">
+              <TopBar
+                isMuted={isMuted}
+                onToggleMute={toggleMute}
+                onOpenSettings={() => setModalAberto(true)}
+              />
 
-      {jogoUI.fase === "aguardando_jogadas" &&
-        jogoUI.escolhaJogador === null && (
-          <BarraEscolhas onEscolher={jogoUI.jogar} />
-        )}
+              <Placar
+                pontosJogador={jogoUI.pontosJogador}
+                pontosBot={jogoUI.pontosOponente}
+                total={config.rodadas}
+              />
 
-      <Jokenpo visivel={jogoUI.fase === "jokenpo"} />
+              <Arena
+                escolhaJogador={jogoUI.escolhaJogador}
+                escolhaOponente={jogoUI.escolhaOponente}
+              />
 
-      <Modal
-        aberto={modalAberto}
-        tipo="jogo"
-        musica={config.musica}
-        efeitos={config.efeitos}
-        onToggleMusica={() =>
-          setConfig(c => {
-            setMusicEnabled(!c.musica);
-            return { ...c, musica: !c.musica };
-          })
-        }
-        onToggleEfeitos={() =>
-          setConfig(c => {
-            setEffectsEnabled(!c.efeitos);
-            return { ...c, efeitos: !c.efeitos };
-          })
-        }
-        onSair={voltarMenu}
-        onFechar={() => setModalAberto(false)}
-      />
-    </div>
+              {/* 🎉 RESULTADO + CONFETES */}
+              {jogoUI.escolhaJogador &&
+                jogoUI.escolhaOponente &&
+                jogoUI.fase !== "jokenpo" &&
+                !jogoUI.finalizado && (
+                  <Resultado
+                    jogador={jogoUI.escolhaJogador}
+                    bot={jogoUI.escolhaOponente}
+                  />
+                )}
+
+              {/* BARRAS */}
+              {modo === "bot" &&
+                jogoUI.escolhaJogador === null &&
+                !jogoUI.finalizado && (
+                  <BarraEscolhas onEscolher={jogoUI.jogar} />
+                )}
+
+              {modo === "online" &&
+                jogoUI.fase === "aguardando_jogadas" &&
+                jogoUI.escolhaJogador === null && (
+                  <BarraEscolhas onEscolher={jogoUI.jogar} />
+                )}
+
+              <Jokenpo visivel={jogoUI.fase === "jokenpo"} />
+            </div>
+          )}
+        </>
+      )}
+
+      {/* MODAL SETTINGS */}
+      {tela === "menu" ? (
+        <Modal
+          aberto={modalAberto}
+          tipo="menu"
+          musica={config.musica}
+          efeitos={config.efeitos}
+          rodadas={config.rodadas}
+          dificuldade={config.dificuldade}
+          onToggleMusica={() =>
+            setConfig(c => {
+              setMusicEnabled(!c.musica);
+              return { ...c, musica: !c.musica };
+            })
+          }
+          onToggleEfeitos={() =>
+            setConfig(c => {
+              setEffectsEnabled(!c.efeitos);
+              return { ...c, efeitos: !c.efeitos };
+            })
+          }
+          onChangeRodadas={v =>
+            setConfig(c => ({ ...c, rodadas: v }))
+          }
+          onChangeDificuldade={v =>
+            setConfig(c => ({ ...c, dificuldade: v }))
+          }
+          onFechar={() => setModalAberto(false)}
+        />
+      ) : (
+        <Modal
+          aberto={modalAberto}
+          tipo="jogo"
+          musica={config.musica}
+          efeitos={config.efeitos}
+          onToggleMusica={() =>
+            setConfig(c => {
+              setMusicEnabled(!c.musica);
+              return { ...c, musica: !c.musica };
+            })
+          }
+          onToggleEfeitos={() =>
+            setConfig(c => {
+              setEffectsEnabled(!c.efeitos);
+              return { ...c, efeitos: !c.efeitos };
+            })
+          }
+          onSair={voltarMenu}
+          onFechar={() => setModalAberto(false)}
+        />
+      )}
+    </>
   );
 }
