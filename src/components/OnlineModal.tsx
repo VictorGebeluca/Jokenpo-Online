@@ -21,7 +21,7 @@ export default function OnlineModal({
   const [carregando, setCarregando] = useState(false);
 
   /* ========================= */
-  /* RESET */
+  /* RESET AO FECHAR */
   /* ========================= */
   useEffect(() => {
     if (!aberto) {
@@ -35,7 +35,7 @@ export default function OnlineModal({
   if (!aberto) return null;
 
   /* ========================= */
-  /* CRIAR SALA */
+  /* CRIAR SALA (JOGADOR 1) */
   /* ========================= */
   function criarSala() {
     setCarregando(true);
@@ -50,14 +50,15 @@ export default function OnlineModal({
       setEtapa("criar");
       setCarregando(false);
 
-      // 🔥 JOGADOR 1 JÁ ENTRA NO MODO ONLINE
+      // 🔥 IMPORTANTE:
+      // Jogador 1 ENTRA na sala (ativa useJogoOnline),
+      // mas NÃO muda de tela ainda
       onSalaPronta(roomId);
-      onFechar();
     });
   }
 
   /* ========================= */
-  /* ENTRAR SALA */
+  /* ENTRAR NA SALA (JOGADOR 2) */
   /* ========================= */
   function entrarSala() {
     if (!codigoInput) return;
@@ -71,7 +72,7 @@ export default function OnlineModal({
     socket.once("JOIN_ROOM_SUCCESS", ({ roomId }) => {
       setCarregando(false);
 
-      // 🔥 JOGADOR 2 ENTRA DIRETO
+      // 🔥 Jogador 2 entra direto no jogo
       onSalaPronta(roomId);
       onFechar();
     });
@@ -108,6 +109,27 @@ export default function OnlineModal({
             >
               Entrar em sala
             </button>
+          </>
+        )}
+
+        {etapa === "criar" && (
+          <>
+            <h2>Sala criada</h2>
+
+            <div className="codigo-sala">
+              <span>{codigoSala}</span>
+              <button
+                onClick={() =>
+                  navigator.clipboard.writeText(codigoSala)
+                }
+              >
+                📋
+              </button>
+            </div>
+
+            <p className="aguardando">
+              Aguardando outro jogador…
+            </p>
           </>
         )}
 

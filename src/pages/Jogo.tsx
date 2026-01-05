@@ -68,13 +68,25 @@ export default function Jogo() {
   );
 
   /* ========================= */
-  /* TROCA DE TELA ONLINE */
+  /* 🔥 TROCA DE TELA ONLINE (CORRIGIDA) */
   /* ========================= */
   useEffect(() => {
-    if (modo === "online") {
-      setTela("jogo");
+    if (modo !== "online") return;
+    if (!roomId) return;
+
+    function onState(state: any) {
+      if (state.jogadores === 2) {
+        setTela("jogo");
+        setModalOnlineAberto(false);
+      }
     }
-  }, [modo]);
+
+    socket.on("room:state", onState);
+
+    return () => {
+      socket.off("room:state", onState);
+    };
+  }, [modo, roomId]);
 
   /* ========================= */
   /* SOCKET ID */
@@ -208,7 +220,6 @@ export default function Jogo() {
           onSalaPronta={id => {
             setModo("online");
             setRoomId(id);
-            setModalOnlineAberto(false);
           }}
         />
       </>
