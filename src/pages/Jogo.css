@@ -202,3 +202,18 @@
     padding: 14px 28px;
   }
 }
+.aguardando-oponente {
+  margin-top: 24px;
+  font-size: 18px;
+  margin-bottom: 40px;   
+  font-weight: 10000;
+  opacity: 0.8;
+  text-align: center;
+  animation: pulse 1.2s infinite;
+}
+
+@keyframes pulse {
+  0% { opacity: 0.5; }
+  50% { opacity: 1; }
+  100% { opacity: 0.5; }
+}

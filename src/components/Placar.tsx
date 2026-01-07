@@ -4,12 +4,14 @@ interface Props {
   pontosJogador: number;
   pontosBot: number;
   total?: number;
+  nomeOponente?: string; // 👈 NOVO
 }
 
 export default function Placar({
   pontosJogador,
   pontosBot,
   total = 3, // 🔥 fallback de segurança
+  nomeOponente = "BOT", // 👈 fallback
 }: Props) {
   return (
     <div className="placar">
@@ -26,7 +28,7 @@ export default function Placar({
       </div>
 
       <div className="lado bot">
-        <span className="nome">BOT</span>
+        <span className="nome">{nomeOponente}</span>
         <div className="bolinhas">
           {Array.from({ length: total }).map((_, i) => (
             <span

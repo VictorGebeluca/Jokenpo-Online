@@ -8,7 +8,7 @@ interface Props {
   onSalaPronta: (roomId: string) => void;
 }
 
-type Etapa = "menu" | "criar" | "entrar";
+type Etapa = "menu" | "configurar" | "criar" | "entrar";
 
 export default function OnlineModal({
   aberto,
@@ -20,6 +20,9 @@ export default function OnlineModal({
   const [codigoInput, setCodigoInput] = useState("");
   const [carregando, setCarregando] = useState(false);
 
+  // 🔥 RODADAS (SÓ APARECE DEPOIS DE CLICAR CRIAR)
+  const [rodadas, setRodadas] = useState<number | null>(null);
+
   /* ========================= */
   /* RESET AO FECHAR */
   /* ========================= */
@@ -29,19 +32,22 @@ export default function OnlineModal({
       setCodigoSala("");
       setCodigoInput("");
       setCarregando(false);
+      setRodadas(null);
     }
   }, [aberto]);
 
   if (!aberto) return null;
 
   /* ========================= */
-  /* CRIAR SALA (JOGADOR 1) */
+  /* CRIAR SALA (CONFIRMADO) */
   /* ========================= */
-  function criarSala() {
+  function confirmarCriacao() {
+    if (!rodadas) return;
+
     setCarregando(true);
 
     socket.emit("CREATE_ROOM", {
-      rodadas: 3,
+      rodadas,
       dificuldade: "normal",
     });
 
@@ -50,15 +56,12 @@ export default function OnlineModal({
       setEtapa("criar");
       setCarregando(false);
 
-      // 🔥 IMPORTANTE:
-      // Jogador 1 ENTRA na sala (ativa useJogoOnline),
-      // mas NÃO muda de tela ainda
       onSalaPronta(roomId);
     });
   }
 
   /* ========================= */
-  /* ENTRAR NA SALA (JOGADOR 2) */
+  /* ENTRAR NA SALA */
   /* ========================= */
   function entrarSala() {
     if (!codigoInput) return;
@@ -71,8 +74,6 @@ export default function OnlineModal({
 
     socket.once("JOIN_ROOM_SUCCESS", ({ roomId }) => {
       setCarregando(false);
-
-      // 🔥 Jogador 2 entra direto no jogo
       onSalaPronta(roomId);
       onFechar();
     });
@@ -91,14 +92,14 @@ export default function OnlineModal({
       <div className="modal online">
         <button className="fechar" onClick={onFechar}>✖</button>
 
+        {/* MENU */}
         {etapa === "menu" && (
           <>
             <h2>Jogar Online</h2>
 
             <button
               className="online-btn"
-              onClick={criarSala}
-              disabled={carregando}
+              onClick={() => setEtapa("configurar")}
             >
               Criar sala
             </button>
@@ -112,6 +113,34 @@ export default function OnlineModal({
           </>
         )}
 
+        {/* CONFIGURAÇÃO DE RODADAS */}
+        {etapa === "configurar" && (
+          <>
+            <h2>Escolha as rodadas</h2>
+
+            <div className="rodadas-opcoes">
+              {[3, 6, 9].map(r => (
+                <button
+                  key={r}
+                  className={`rodada-btn ${rodadas === r ? "ativa" : ""}`}
+                  onClick={() => setRodadas(r)}
+                >
+                  {r}
+                </button>
+              ))}
+            </div>
+
+            <button
+              className="online-btn"
+              disabled={!rodadas || carregando}
+              onClick={confirmarCriacao}
+            >
+              Criar partida
+            </button>
+          </>
+        )}
+
+        {/* SALA CRIADA */}
         {etapa === "criar" && (
           <>
             <h2>Sala criada</h2>
@@ -130,9 +159,14 @@ export default function OnlineModal({
             <p className="aguardando">
               Aguardando outro jogador…
             </p>
+
+            <p className="info-rodadas">
+              Rodadas: <strong>{rodadas}</strong>
+            </p>
           </>
         )}
 
+        {/* ENTRAR EM SALA */}
         {etapa === "entrar" && (
           <>
             <h2>Entrar em sala</h2>

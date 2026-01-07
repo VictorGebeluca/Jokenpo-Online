@@ -14,9 +14,14 @@ export type Fase =
 
 export interface EstadoSala {
   fase: Fase;
+
+  jogadores: number;
+
   escolhas: Record<string, Escolha | null>;
   pontos: Record<string, number>;
-  jogadores: number;
+
+  rodadas: number; // 🔥 NECESSÁRIO PRO PLACAR
+
   vencedorRodada?: string;
   vencedorFinal?: string;
 }
@@ -40,13 +45,13 @@ export function useJogoOnline(roomId: string | null) {
   useEffect(() => {
     if (!roomId) return;
 
-    const onState = (novoEstado: EstadoSala) => {
+    function onState(novoEstado: EstadoSala) {
       setEstado(novoEstado);
-    };
+    }
 
     socket.on("room:state", onState);
 
-    // 🔥 PEDE O ESTADO ATUAL (ESSENCIAL PARA REFRESH / RECONNECT)
+    // 🔥 IMPORTANTE: sync ao entrar / refresh
     socket.emit("room:get_state", { roomId });
 
     return () => {

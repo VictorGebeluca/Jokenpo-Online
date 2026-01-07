@@ -5,6 +5,7 @@ import { Dificuldade } from "../contracts/events";
 /* TIPOS */
 /* ========================= */
 export type Escolha = "pedra" | "papel" | "tesoura";
+
 export type Fase =
   | "aguardando_jogadores"
   | "aguardando_jogadas"
@@ -17,6 +18,7 @@ interface EstadoSala {
   escolhas: Record<string, Escolha | null>;
   pontos: Record<string, number>;
   jogadores: number;
+  rodadas: number; // 🔥 OBRIGATÓRIO
   vencedorRodada?: string;
   vencedorFinal?: string;
 }
@@ -75,10 +77,8 @@ export class Room {
     this.emitirEstado();
 
     if (this.jogadores.length === 2) {
-      setTimeout(() => {
-        this.fase = "aguardando_jogadas";
-        this.emitirEstado();
-      }, 0);
+      this.fase = "aguardando_jogadas";
+      this.emitirEstado();
     }
 
     return true;
@@ -112,11 +112,11 @@ export class Room {
 
     if (todosEscolheram) {
       this.fase = "jokenpo";
-      this.emitirEstado(); // ⚠️ ainda sem revelar escolhas
+      this.emitirEstado(); // ❌ não revela ainda
 
       setTimeout(() => this.resolverRodada(), 2000);
     } else {
-      this.emitirEstado(); // só status, sem revelar
+      this.emitirEstado(); // só status
     }
   }
 
@@ -165,7 +165,7 @@ export class Room {
   /* RESET RODADA */
   /* ========================= */
   private resetarRodada() {
-    this.escolhas.forEach((_, key) => this.escolhas.set(key, null));
+    this.escolhas.forEach((_, id) => this.escolhas.set(id, null));
     this.fase = "aguardando_jogadas";
     this.emitirEstado();
   }
@@ -209,17 +209,17 @@ export class Room {
   }
 
   /* ========================= */
-  /* EMISSÃO (SEM VAZAR ESCOLHA) */
+  /* EMISSÃO DE ESTADO */
   /* ========================= */
   emitirEstado(
     vencedorRodada?: string,
     vencedorFinal?: string
   ) {
-    const estadoBase: EstadoSala = {
+    const estadoBase: Omit<EstadoSala, "escolhas"> = {
       fase: this.fase,
-      escolhas: {},
       pontos: Object.fromEntries(this.pontos),
       jogadores: this.quantidadeJogadores,
+      rodadas: this.rodadas, // 🔥 AQUI
       vencedorRodada,
       vencedorFinal,
     };
@@ -228,8 +228,11 @@ export class Room {
       const escolhasVisiveis: Record<string, Escolha | null> = {};
 
       this.jogadores.forEach(j => {
-        // 👇 só revela escolha do outro após resultado
-        if (j.id === socket.id || this.fase === "resultado" || this.fase === "finalizado") {
+        if (
+          j.id === socket.id ||
+          this.fase === "resultado" ||
+          this.fase === "finalizado"
+        ) {
           escolhasVisiveis[j.id] = this.escolhas.get(j.id) ?? null;
         } else {
           escolhasVisiveis[j.id] = null;
