@@ -41,7 +41,8 @@ export function jogoFinalizado(
 
 /**
  * Decide o vencedor final
- * (chamar somente se o jogo estiver finalizado...)
+ * (chamar somente se o jogo estiver finalizado.....
+ * )
  */
 export function decidirVencedorFinal(
   pontosJogador: number,
