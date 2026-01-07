@@ -69,12 +69,12 @@ export default function Jogo() {
   );
 
   /* ========================= */
-  /* ENTRADA AUTOMÁTICA NO JOGO ONLINE */
+  /* TRANSIÇÃO PARA JOGO ONLINE */
   /* ========================= */
   useEffect(() => {
     if (modo !== "online" || !roomId) return;
 
-    function onState(state: { jogadores: number }) {
+    function onState(state: any) {
       if (state.jogadores === 2) {
         setTela("jogo");
         setModalOnlineAberto(false);
@@ -99,9 +99,9 @@ export default function Jogo() {
           pontosJogador: jogoBot.pontosJogadorVisivel,
           pontosOponente: jogoBot.pontosBotVisivel,
           totalRodadas: config.rodadas,
-          resultadoRodada: jogoBot.resultadoRodada,
           finalizado: jogoBot.finalizado,
           vencedor: jogoBot.vencedor,
+          vencedorRodada: jogoBot.vencedorRodada,
           jogar: jogoBot.jogar,
           reiniciar: jogoBot.reiniciar,
         }
@@ -116,9 +116,9 @@ export default function Jogo() {
               pontosJogador: 0,
               pontosOponente: 0,
               totalRodadas: 3,
-              resultadoRodada: undefined,
               finalizado: false,
               vencedor: undefined,
+              vencedorRodada: undefined,
               jogar: () => {},
               reiniciar: () => {},
             };
@@ -127,27 +127,10 @@ export default function Jogo() {
           const ids = Object.keys(estado.pontos);
           const oponenteId = ids.find(id => id !== meuId);
 
-          let vencedorFinal: "jogador" | "bot" | undefined;
+          let vencedor: "jogador" | "bot" | undefined;
           if (estado.vencedorFinal) {
-            vencedorFinal =
+            vencedor =
               estado.vencedorFinal === meuId ? "jogador" : "bot";
-          }
-
-          let resultadoRodada:
-            | "jogador"
-            | "bot"
-            | "empate"
-            | undefined;
-
-          if (estado.vencedorRodada !== undefined) {
-            if (estado.vencedorRodada === null) {
-              resultadoRodada = "empate";
-            } else {
-              resultadoRodada =
-                estado.vencedorRodada === meuId
-                  ? "jogador"
-                  : "bot";
-            }
           }
 
           return {
@@ -161,13 +144,31 @@ export default function Jogo() {
               ? estado.pontos[oponenteId] ?? 0
               : 0,
             totalRodadas: estado.rodadas,
-            resultadoRodada,
             finalizado: estado.fase === "finalizado",
-            vencedor: vencedorFinal,
+            vencedor,
+            vencedorRodada: estado.vencedorRodada,
             jogar: jogoOnline.escolher,
             reiniciar: jogoOnline.reiniciar,
           };
         })();
+
+  /* ========================= */
+  /* CONFETE / SOM POR RODADA */
+  /* ========================= */
+  const ultimaRodada = useRef<string | undefined>();
+
+  useEffect(() => {
+    if (!jogoUI.vencedorRodada) return;
+    if (ultimaRodada.current === jogoUI.vencedorRodada) return;
+
+    ultimaRodada.current = jogoUI.vencedorRodada;
+
+    if (jogoUI.vencedorRodada === meuId || modo === "bot") {
+      playFinalWin();
+    } else {
+      playFinalLose();
+    }
+  }, [jogoUI.vencedorRodada]);
 
   /* ========================= */
   /* SOM FINAL */
@@ -179,6 +180,7 @@ export default function Jogo() {
     if (!jogoUI.vencedor) return;
 
     somFinalTocado.current = true;
+
     jogoUI.vencedor === "jogador"
       ? playFinalWin()
       : playFinalLose();
@@ -271,22 +273,22 @@ export default function Jogo() {
                 escolhaOponente={jogoUI.escolhaOponente}
               />
 
-              {jogoUI.resultadoRodada && (
-                <Resultado
-                  resultado={jogoUI.resultadoRodada}
-                  jogador={jogoUI.escolhaJogador}
-                  bot={jogoUI.escolhaOponente}
-                />
-              )}
+              {jogoUI.escolhaJogador &&
+                jogoUI.escolhaOponente &&
+                jogoUI.fase !== "jokenpo" &&
+                !jogoUI.finalizado && (
+                  <Resultado
+                    jogador={jogoUI.escolhaJogador}
+                    bot={jogoUI.escolhaOponente}
+                  />
+                )}
 
-              {/* BOT */}
               {modo === "bot" &&
                 jogoUI.escolhaJogador === null &&
                 !jogoUI.finalizado && (
                   <BarraEscolhas onEscolher={jogoUI.jogar} />
                 )}
 
-              {/* ONLINE */}
               {modo === "online" &&
                 jogoUI.fase === "aguardando_jogadas" &&
                 (jogoUI.escolhaJogador === null ? (
@@ -303,34 +305,57 @@ export default function Jogo() {
         </>
       )}
 
-      <Modal
-        aberto={modalAberto}
-        tipo={tela === "menu" ? "menu" : "jogo"}
-        musica={config.musica}
-        efeitos={config.efeitos}
-        rodadas={config.rodadas}
-        dificuldade={config.dificuldade}
-        onToggleMusica={() =>
-          setConfig(c => {
-            setMusicEnabled(!c.musica);
-            return { ...c, musica: !c.musica };
-          })
-        }
-        onToggleEfeitos={() =>
-          setConfig(c => {
-            setEffectsEnabled(!c.efeitos);
-            return { ...c, efeitos: !c.efeitos };
-          })
-        }
-        onChangeRodadas={v =>
-          setConfig(c => ({ ...c, rodadas: v }))
-        }
-        onChangeDificuldade={v =>
-          setConfig(c => ({ ...c, dificuldade: v }))
-        }
-        onSair={tela === "jogo" ? voltarMenu : undefined}
-        onFechar={() => setModalAberto(false)}
-      />
+      {/* MODAL SETTINGS — CORRETO PARA TS */}
+      {tela === "menu" ? (
+        <Modal
+          aberto={modalAberto}
+          tipo="menu"
+          musica={config.musica}
+          efeitos={config.efeitos}
+          rodadas={config.rodadas}
+          dificuldade={config.dificuldade}
+          onToggleMusica={() =>
+            setConfig(c => {
+              setMusicEnabled(!c.musica);
+              return { ...c, musica: !c.musica };
+            })
+          }
+          onToggleEfeitos={() =>
+            setConfig(c => {
+              setEffectsEnabled(!c.efeitos);
+              return { ...c, efeitos: !c.efeitos };
+            })
+          }
+          onChangeRodadas={v =>
+            setConfig(c => ({ ...c, rodadas: v }))
+          }
+          onChangeDificuldade={v =>
+            setConfig(c => ({ ...c, dificuldade: v }))
+          }
+          onFechar={() => setModalAberto(false)}
+        />
+      ) : (
+        <Modal
+          aberto={modalAberto}
+          tipo="jogo"
+          musica={config.musica}
+          efeitos={config.efeitos}
+          onToggleMusica={() =>
+            setConfig(c => {
+              setMusicEnabled(!c.musica);
+              return { ...c, musica: !c.musica };
+            })
+          }
+          onToggleEfeitos={() =>
+            setConfig(c => {
+              setEffectsEnabled(!c.efeitos);
+              return { ...c, efeitos: !c.efeitos };
+            })
+          }
+          onSair={voltarMenu}
+          onFechar={() => setModalAberto(false)}
+        />
+      )}
     </>
   );
 }
