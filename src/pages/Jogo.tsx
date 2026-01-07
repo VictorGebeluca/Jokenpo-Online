@@ -21,6 +21,7 @@ import "./Jogo.css";
 
 type Tela = "menu" | "jogo";
 type ModoJogo = "bot" | "online";
+type VencedorUI = "jogador" | "bot";
 
 export default function Jogo() {
   const [tela, setTela] = useState<Tela>("menu");
@@ -64,25 +65,27 @@ export default function Jogo() {
   /* ========================= */
   /* ONLINE */
   /* ========================= */
-  const jogoOnline = useJogoOnline(
-    modo === "online" ? roomId : null
-  );
+  const jogoOnline = useJogoOnline(modo === "online" ? roomId : null);
 
   /* ========================= */
-  /* TRANSIÇÃO PARA JOGO ONLINE */
+  /* ENTRADA NA SALA ONLINE */
   /* ========================= */
   useEffect(() => {
     if (modo !== "online" || !roomId) return;
 
-    function onState(state: any) {
+    const onState = (state: any) => {
       if (state.jogadores === 2) {
         setTela("jogo");
         setModalOnlineAberto(false);
       }
-    }
+    };
 
     socket.on("room:state", onState);
-    return () => socket.off("room:state", onState);
+
+    // ✅ cleanup correto (NÃO retorna Socket)
+    return () => {
+      socket.off("room:state", onState);
+    };
   }, [modo, roomId]);
 
   const meuId = socket.id;
@@ -100,8 +103,8 @@ export default function Jogo() {
           pontosOponente: jogoBot.pontosBotVisivel,
           totalRodadas: config.rodadas,
           finalizado: jogoBot.finalizado,
-          vencedor: jogoBot.vencedor,
-          vencedorRodada: jogoBot.vencedorRodada,
+          vencedor: jogoBot.vencedor as VencedorUI | undefined,
+          vencedorRodada: undefined as string | undefined,
           jogar: jogoBot.jogar,
           reiniciar: jogoBot.reiniciar,
         }
@@ -117,8 +120,8 @@ export default function Jogo() {
               pontosOponente: 0,
               totalRodadas: 3,
               finalizado: false,
-              vencedor: undefined,
-              vencedorRodada: undefined,
+              vencedor: undefined as VencedorUI | undefined,
+              vencedorRodada: undefined as string | undefined,
               jogar: () => {},
               reiniciar: () => {},
             };
@@ -127,11 +130,12 @@ export default function Jogo() {
           const ids = Object.keys(estado.pontos);
           const oponenteId = ids.find(id => id !== meuId);
 
-          let vencedor: "jogador" | "bot" | undefined;
-          if (estado.vencedorFinal) {
-            vencedor =
-              estado.vencedorFinal === meuId ? "jogador" : "bot";
-          }
+          const vencedor: VencedorUI | undefined =
+            estado.vencedorFinal === meuId
+              ? "jogador"
+              : estado.vencedorFinal
+              ? "bot"
+              : undefined;
 
           return {
             fase: estado.fase,
@@ -155,7 +159,7 @@ export default function Jogo() {
   /* ========================= */
   /* CONFETE / SOM POR RODADA */
   /* ========================= */
-  const ultimaRodada = useRef<string | undefined>();
+  const ultimaRodada = useRef<string | undefined>(undefined);
 
   useEffect(() => {
     if (!jogoUI.vencedorRodada) return;
@@ -163,12 +167,12 @@ export default function Jogo() {
 
     ultimaRodada.current = jogoUI.vencedorRodada;
 
-    if (jogoUI.vencedorRodada === meuId || modo === "bot") {
+    if (modo === "bot" || jogoUI.vencedorRodada === meuId) {
       playFinalWin();
     } else {
       playFinalLose();
     }
-  }, [jogoUI.vencedorRodada]);
+  }, [jogoUI.vencedorRodada, modo, meuId]);
 
   /* ========================= */
   /* SOM FINAL */
@@ -275,7 +279,6 @@ export default function Jogo() {
 
               {jogoUI.escolhaJogador &&
                 jogoUI.escolhaOponente &&
-                jogoUI.fase !== "jokenpo" &&
                 !jogoUI.finalizado && (
                   <Resultado
                     jogador={jogoUI.escolhaJogador}
@@ -284,8 +287,7 @@ export default function Jogo() {
                 )}
 
               {modo === "bot" &&
-                jogoUI.escolhaJogador === null &&
-                !jogoUI.finalizado && (
+                jogoUI.escolhaJogador === null && (
                   <BarraEscolhas onEscolher={jogoUI.jogar} />
                 )}
 
@@ -305,7 +307,6 @@ export default function Jogo() {
         </>
       )}
 
-      {/* MODAL SETTINGS — CORRETO PARA TS */}
       {tela === "menu" ? (
         <Modal
           aberto={modalAberto}

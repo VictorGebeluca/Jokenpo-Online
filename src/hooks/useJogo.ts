@@ -57,6 +57,11 @@ export function useJogo({
   const [finalizado, setFinalizado] = useState(false);
   const [vencedor, setVencedor] = useState<VencedorFinal | null>(null);
 
+  // ✅ NOVO — usado para confete / animação por rodada
+  const [vencedorRodada, setVencedorRodada] = useState<
+    "jogador" | "bot" | null
+  >(null);
+
   /* ========================= */
   /* CONTROLE */
   /* ========================= */
@@ -84,6 +89,7 @@ export function useJogo({
     if (bloqueado) return;
 
     onPlayButton();
+    setVencedorRodada(null);
     setFase("jokenpo");
 
     timeouts.current.push(
@@ -104,11 +110,13 @@ export function useJogo({
 
             if (resultado === "jogador") {
               novoJogador++;
+              setVencedorRodada("jogador"); // ✅
               onPlayWinner();
             }
 
             if (resultado === "bot") {
               novoBot++;
+              setVencedorRodada("bot"); // ✅
               onPlayLoser();
             }
 
@@ -137,6 +145,7 @@ export function useJogo({
                   window.setTimeout(() => {
                     setEscolhaJogador(null);
                     setEscolhaBot(null);
+                    setVencedorRodada(null);
                     setFase("idle");
                   }, 2600)
                 );
@@ -158,6 +167,7 @@ export function useJogo({
     setFase("idle");
     setFinalizado(false);
     setVencedor(null);
+    setVencedorRodada(null);
     setEscolhaJogador(null);
     setEscolhaBot(null);
     setPontosJogador(0);
@@ -177,6 +187,7 @@ export function useJogo({
     pontosBotVisivel,
     finalizado,
     vencedor,
+    vencedorRodada, // ✅ EXPOSIÇÃO CORRETA
     jogar,
     reiniciar,
   };
