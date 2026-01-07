@@ -29,6 +29,7 @@ export function decidirRodada(
 
 /**
  * Verifica se o jogo terminou
+ * (alguém atingiu o número de rodadas)
  */
 export function jogoFinalizado(
   pontosJogador: number,
@@ -44,7 +45,7 @@ export function jogoFinalizado(
  */
 export function decidirVencedorFinal(
   pontosJogador: number,
- totalRodadas: number
+  pontosBot: number
 ): VencedorFinal {
-  return pontosJogador === totalRodadas ? "jogador" : "bot";
+  return pontosJogador > pontosBot ? "jogador" : "bot";
 }

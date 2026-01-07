@@ -55,7 +55,7 @@ export function useJogo({
   const [pontosBotVisivel, setPontosBotVisivel] = useState(0);
 
   const [finalizado, setFinalizado] = useState(false);
-  const [vencedor, setVencedor] = useState<VencedorFinal>("jogador");
+  const [vencedor, setVencedor] = useState<VencedorFinal | null>(null);
 
   /* ========================= */
   /* CONTROLE */
@@ -89,7 +89,6 @@ export function useJogo({
     timeouts.current.push(
       window.setTimeout(() => {
         const bot = escolherBot(escolha);
-
         onPlayDrums();
 
         timeouts.current.push(
@@ -122,12 +121,14 @@ export function useJogo({
                 setPontosBotVisivel(novoBot);
 
                 if (jogoFinalizado(novoJogador, novoBot, rodadas)) {
-                  setVencedor(
-                    decidirVencedorFinal(novoJogador, novoBot)
-                  );
+                  const vencedorFinal: VencedorFinal =
+                    decidirVencedorFinal(novoJogador, novoBot);
 
                   timeouts.current.push(
-                    window.setTimeout(() => setFinalizado(true), 1200)
+                    window.setTimeout(() => {
+                      setVencedor(vencedorFinal);
+                      setFinalizado(true);
+                    }, 1200)
                   );
                   return;
                 }
@@ -149,14 +150,14 @@ export function useJogo({
 
   /* ========================= */
   /* RESET */
-/* ========================= */
+  /* ========================= */
   function reiniciar() {
     limparTimeouts();
-
-    resetarBotDificil(); // 🧠 limpa memória do bot difícil
+    resetarBotDificil();
 
     setFase("idle");
     setFinalizado(false);
+    setVencedor(null);
     setEscolhaJogador(null);
     setEscolhaBot(null);
     setPontosJogador(0);
@@ -167,7 +168,7 @@ export function useJogo({
 
   /* ========================= */
   /* API */
-/* ========================= */
+  /* ========================= */
   return {
     fase,
     escolhaJogador,
