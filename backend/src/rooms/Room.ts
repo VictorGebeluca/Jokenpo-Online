@@ -48,7 +48,6 @@ export class Room {
   private fase: Fase = "aguardando_jogadores";
   private escolhas = new Map<string, Escolha | null>();
   private pontos = new Map<string, number>();
-  private rodadaAtual = 0;
 
   constructor(
     id: string,
@@ -73,11 +72,8 @@ export class Room {
     this.escolhas.set(socket.id, null);
     this.pontos.set(socket.id, 0);
 
-    // 1️⃣ Sempre emite o estado atual ao entrar
     this.emitirEstado();
 
-    // 2️⃣ Só depois que os DOIS já receberam o estado,
-    // muda para aguardando_jogadas
     if (this.jogadores.length === 2) {
       setTimeout(() => {
         this.fase = "aguardando_jogadas";
@@ -93,10 +89,7 @@ export class Room {
     this.escolhas.delete(socket.id);
     this.pontos.delete(socket.id);
 
-    if (this.jogadores.length < 2) {
-      this.fase = "aguardando_jogadores";
-    }
-
+    this.fase = "aguardando_jogadores";
     this.emitirEstado();
   }
 
@@ -113,20 +106,23 @@ export class Room {
 
     this.escolhas.set(socket.id, escolha);
 
-    const todasEscolhas = Array.from(this.escolhas.values()).every(
+    const todosEscolheram = Array.from(this.escolhas.values()).every(
       e => e !== null
     );
 
-    if (todasEscolhas) {
+    if (todosEscolheram) {
       this.fase = "jokenpo";
-      this.emitirEstado();
+      this.emitirEstado(); // ⚠️ ainda sem revelar escolhas
 
       setTimeout(() => this.resolverRodada(), 2000);
     } else {
-      this.emitirEstado();
+      this.emitirEstado(); // só status, sem revelar
     }
   }
 
+  /* ========================= */
+  /* RESULTADO */
+  /* ========================= */
   private resolverRodada() {
     if (this.jogadores.length < 2) return;
 
@@ -150,23 +146,33 @@ export class Room {
       vencedorRodada = b.id;
     }
 
-    this.rodadaAtual++;
-
     this.emitirEstado(vencedorRodada);
 
-    if (this.rodadaAtual >= this.rodadas) {
+    const pontosA = this.pontos.get(a.id)!;
+    const pontosB = this.pontos.get(b.id)!;
+
+    const alguemVenceu =
+      pontosA >= this.rodadas || pontosB >= this.rodadas;
+
+    if (alguemVenceu) {
       setTimeout(() => this.finalizarJogo(), 2000);
     } else {
       setTimeout(() => this.resetarRodada(), 2500);
     }
   }
 
+  /* ========================= */
+  /* RESET RODADA */
+  /* ========================= */
   private resetarRodada() {
     this.escolhas.forEach((_, key) => this.escolhas.set(key, null));
     this.fase = "aguardando_jogadas";
     this.emitirEstado();
   }
 
+  /* ========================= */
+  /* FINAL */
+  /* ========================= */
   private finalizarJogo() {
     this.fase = "finalizado";
 
@@ -183,11 +189,9 @@ export class Room {
   }
 
   /* ========================= */
-  /* RESET */
+  /* RESET TOTAL */
   /* ========================= */
   reset() {
-    this.rodadaAtual = 0;
-
     this.escolhas.clear();
     this.pontos.clear();
 
@@ -205,15 +209,15 @@ export class Room {
   }
 
   /* ========================= */
-  /* EMISSÃO */
+  /* EMISSÃO (SEM VAZAR ESCOLHA) */
   /* ========================= */
   emitirEstado(
     vencedorRodada?: string,
     vencedorFinal?: string
   ) {
-    const estado: EstadoSala = {
+    const estadoBase: EstadoSala = {
       fase: this.fase,
-      escolhas: Object.fromEntries(this.escolhas),
+      escolhas: {},
       pontos: Object.fromEntries(this.pontos),
       jogadores: this.quantidadeJogadores,
       vencedorRodada,
@@ -221,7 +225,21 @@ export class Room {
     };
 
     this.jogadores.forEach(socket => {
-      socket.emit("room:state", estado);
+      const escolhasVisiveis: Record<string, Escolha | null> = {};
+
+      this.jogadores.forEach(j => {
+        // 👇 só revela escolha do outro após resultado
+        if (j.id === socket.id || this.fase === "resultado" || this.fase === "finalizado") {
+          escolhasVisiveis[j.id] = this.escolhas.get(j.id) ?? null;
+        } else {
+          escolhasVisiveis[j.id] = null;
+        }
+      });
+
+      socket.emit("room:state", {
+        ...estadoBase,
+        escolhas: escolhasVisiveis,
+      });
     });
   }
 }
