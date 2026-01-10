@@ -1,16 +1,24 @@
 import { io } from "socket.io-client";
 
 /* ========================= */
+/* SOCKET URL */
+/* ========================= */
+const SOCKET_URL =
+  import.meta.env.VITE_SOCKET_URL || "http://localhost:3001";
+
+/* ========================= */
 /* SOCKET CLIENT */
 /* ========================= */
-export const socket = io("http://localhost:3001", {
+export const socket = io(SOCKET_URL, {
   transports: ["websocket"],
 });
 
 /* ========================= */
 /* DEBUG GLOBAL (DEV ONLY) */
 /* ========================= */
-(window as any).socket = socket;
+if (import.meta.env.DEV) {
+  (window as any).socket = socket;
+}
 
 /* ========================= */
 /* LIFECYCLE */
@@ -25,26 +33,4 @@ socket.on("disconnect", reason => {
 
 socket.on("connect_error", err => {
   console.error("❌ Erro de conexão socket:", err.message);
-});
-
-/* ========================= */
-/* SALAS */
-/* ========================= */
-socket.on("ROOM_CREATED", data => {
-  console.log("🏠 Sala criada:", data.roomId);
-});
-
-socket.on("PLAYER_JOINED", data => {
-  console.log("👥 Jogadores na sala:", data.jogadores);
-});
-
-socket.on("JOIN_ROOM_ERROR", data => {
-  console.log("❌ Erro ao entrar na sala:", data.message);
-});
-
-/* ========================= */
-/* ESTADO DO JOGO */
-/* ========================= */
-socket.on("room:state", estado => {
-  console.log("🎮 Estado da sala:", estado);
 });
