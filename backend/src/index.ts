@@ -7,22 +7,19 @@ const app = express();
 const server = http.createServer(app);
 
 /* ========================= */
-/* SOCKET.IO (CORS CORRETO) */
+/* SOCKET.IO */
 /* ========================= */
 const io = new Server(server, {
   cors: {
-    origin: "http://localhost:5173", // frontend (Vite)
+    origin: "*", // depois podemos restringir
     methods: ["GET", "POST"],
   },
 });
 
-/* ========================= */
-/* SOCKET HANDLERS */
-/* ========================= */
 registerSocket(io);
 
 /* ========================= */
-/* ROTAS HTTP (OPCIONAL) */
+/* HEALTH CHECK */
 /* ========================= */
 app.get("/", (_req, res) => {
   res.send("🟢 Jokenpo Backend Online");
@@ -31,8 +28,8 @@ app.get("/", (_req, res) => {
 /* ========================= */
 /* START SERVER */
 /* ========================= */
-const PORT = 3001;
+const PORT = Number(process.env.PORT) || 3001;
 
 server.listen(PORT, () => {
-  console.log(`🚀 Backend rodando em http://localhost:${PORT}`);
+  console.log(`🚀 Backend rodando na porta ${PORT}`);
 });

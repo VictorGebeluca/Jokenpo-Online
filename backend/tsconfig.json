@@ -5,6 +5,8 @@
     "target": "ES2020",
     "module": "CommonJS",
     "strict": true,
-    "esModuleInterop": true
-  }
+    "esModuleInterop": true,
+    "noEmit": false
+  },
+  "include": ["src/**/*.ts"]
 }
