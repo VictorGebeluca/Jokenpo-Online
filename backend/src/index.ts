@@ -1,4 +1,4 @@
-import express from "express";
+import express, { Request, Response } from "express";
 import http from "http";
 import { Server } from "socket.io";
 import { registerSocket } from "./socket";
@@ -11,7 +11,7 @@ const server = http.createServer(app);
 /* ========================= */
 const io = new Server(server, {
   cors: {
-    origin: "*", // depois podemos restringir
+    origin: "*",
     methods: ["GET", "POST"],
   },
 });
@@ -21,7 +21,7 @@ registerSocket(io);
 /* ========================= */
 /* HEALTH CHECK */
 /* ========================= */
-app.get("/", (_req, res) => {
+app.get("/", (_req: Request, res: Response) => {
   res.send("🟢 Jokenpo Backend Online");
 });
 
