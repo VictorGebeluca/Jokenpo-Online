@@ -4,7 +4,7 @@
   display: flex;
   flex-direction: column;
 
-  /* 🎨 FUNDO CARTOON */
+  /* FUNDO CARTOON */
   background-color: #bae6fd; /* azul alegre */
 
   /* pattern de bolinhas estilo brinquedo */
@@ -132,22 +132,8 @@
   }
 }
 
-/* ===================== */
-/* FOGOS (SE USAR) */
-/* ===================== */
-.fogos-fim {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  z-index: 50;
-  pointer-events: none;
-}
-
-/* ===================== */
 /* BOTÃO REINICIAR */
-/* ===================== */
+
 .btn-reiniciar {
   margin-top: 28px;
 

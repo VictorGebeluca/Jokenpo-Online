@@ -1,73 +1,74 @@
-# React + TypeScript + Vite
+# Jokenpo Online - Multiplayer em Tempo Real
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Este é um projeto de Jokenpo (Pedra, Papel e Tesoura) desenvolvido para aplicar conceitos de comunicação bidirecional em tempo real utilizando WebSockets. O foco principal foi a construção de um servidor robusto capaz de gerenciar múltiplos estados de jogo simultaneamente.
 
-Currently, two official plugins are available:
+> **Status do Projeto:** Concluído / Em manutenção para melhorias de UI.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+---
 
-## React Compiler
+## Demonstração
+Você pode testar a aplicação rodando em tempo real aqui: [Link do Render](https://jokenpo-frontend-wj14.onrender.com)
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+---
 
-## Expanding the ESLint configuration
+## Tecnologias Utilizadas
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+### **Backend**
+* **Node.js**: Ambiente de execução.
+* **TypeScript**: Tipagem estática para maior segurança e manutenibilidade.
+* **Socket.io**: Biblioteca principal para comunicação via WebSockets.
+* **Express**: Gerenciamento de rotas e middleware.
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+### **Frontend**
+* **React**: Construção da interface de usuário.
+* **Vite**: Ferramenta de build rápida.
+* **Tailwind CSS**: Estilização moderna e responsiva.
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+---
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+## Desafios e Aprendizados
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+Durante o desenvolvimento deste projeto, foquei em resolver problemas comuns de aplicações em tempo real:
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+1.  **Gerenciamento de Salas (Rooms):** Implementei a lógica de criação e entrada em salas para permitir que diferentes pares de jogadores joguem ao mesmo tempo sem interferência.
+2.  **Sincronização de Estado:** Garanti que ambos os jogadores recebam a atualização do resultado da rodada exatamente ao mesmo tempo, tratando latências de rede.
+3.  **Lógica de Negócio no Server-side:** Toda a validação de quem ganhou a rodada é feita no backend para garantir a integridade das partidas.
+4.  **Arquitetura Baseada em Eventos:** Estruturação do fluxo de dados utilizando eventos específicos (join_room, make_move, receive_result).
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+---
+
+## Como rodar o projeto localmente
+
+### Pré-requisitos
+* Node.js instalado (v18 ou superior)
+* npm ou yarn
+
+### Passo a passo
+1.  **Clone o repositório:**
+    ```bash
+    git clone [https://github.com/VictorGebeluca/Jokenpo-Online.git](https://github.com/VictorGebeluca/Jokenpo-Online.git)
+    cd Jokenpo-Online
+    ```
+
+2.  **Configuração do Backend:**
+    ```bash
+    cd backend
+    npm install
+    npm run dev
+    ```
+
+3.  **Configuração do Frontend:**
+    ```bash
+    cd ../frontend
+    npm install
+    npm run dev
+    ```
+
+---
+
+## Contato
+
+Victor Gebeluca – [LinkedIn](https://www.linkedin.com/in/victor-miguel-2847ba267) – victormiguel01@gmail.com
+
+---
+Desenvolvido por Victor Gebeluca.

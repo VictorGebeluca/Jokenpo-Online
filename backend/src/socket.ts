@@ -56,7 +56,7 @@ export function registerSocket(io: Server) {
     });
 
     /* ========================= */
-    /* 🔥 PEDIR ESTADO ATUAL (REFRESH SAFE) */
+    /*PEDIR ESTADO ATUAL (REFRESH SAFE) */
     /* ========================= */
     socket.on("room:get_state", ({ roomId }) => {
   const room = roomManager.get(roomId);
