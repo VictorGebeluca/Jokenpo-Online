@@ -2,7 +2,7 @@
 
 Este é um projeto de Jokenpo (Pedra, Papel e Tesoura) desenvolvido para aplicar conceitos de comunicação bidirecional em tempo real utilizando WebSockets. O foco principal foi a construção de um servidor robusto capaz de gerenciar múltiplos estados de jogo simultaneamente.
 
-> **Status do Projeto:** Concluído / Em manutenção para melhorias de UI.
+> **Status do Projeto:** Concluído / Em manutenção.
 
 ---
 
@@ -16,13 +16,13 @@ Você pode testar a aplicação rodando em tempo real aqui: [Link do Render](htt
 ### **Backend**
 * **Node.js**: Ambiente de execução.
 * **TypeScript**: Tipagem estática para maior segurança e manutenibilidade.
+* **Express**: Framework para gerenciamento do servidor HTTP.
 * **Socket.io**: Biblioteca principal para comunicação via WebSockets.
-* **Express**: Gerenciamento de rotas e middleware.
 
 ### **Frontend**
-* **React**: Construção da interface de usuário.
+* **React**: Biblioteca para construção da interface de usuário.
 * **Vite**: Ferramenta de build rápida.
-* **Tailwind CSS**: Estilização moderna e responsiva.
+* **CSS Nativo**: Estilização personalizada para a interface.
 
 ---
 
@@ -30,10 +30,10 @@ Você pode testar a aplicação rodando em tempo real aqui: [Link do Render](htt
 
 Durante o desenvolvimento deste projeto, foquei em resolver problemas comuns de aplicações em tempo real:
 
-1.  **Gerenciamento de Salas (Rooms):** Implementei a lógica de criação e entrada em salas para permitir que diferentes pares de jogadores joguem ao mesmo tempo sem interferência.
-2.  **Sincronização de Estado:** Garanti que ambos os jogadores recebam a atualização do resultado da rodada exatamente ao mesmo tempo, tratando latências de rede.
-3.  **Lógica de Negócio no Server-side:** Toda a validação de quem ganhou a rodada é feita no backend para garantir a integridade das partidas.
-4.  **Arquitetura Baseada em Eventos:** Estruturação do fluxo de dados utilizando eventos específicos (join_room, make_move, receive_result).
+1.  **Gerenciamento de Salas (Rooms):** Implementação de lógica para isolar partidas em salas, permitindo que vários pares joguem simultaneamente.
+2.  **Sincronização de Estado:** Garantia de que ambos os jogadores recebam atualizações de jogadas e resultados em tempo real.
+3.  **Lógica de Negócio no Server-side:** Toda a validação de vitória/derrota é processada no backend para garantir a integridade das partidas.
+4.  **Arquitetura Baseada em Eventos:** Estruturação do fluxo de dados utilizando eventos específicos do Socket.io (join_room, make_move, receive_result).
 
 ---
 
